@@ -1,24 +1,86 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import MainLayout from './components/layout/MainLayout';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import Dashboard from './pages/Dashboard';
+import Workflows from './pages/Workflows';
+import CreateWorkflow from './pages/CreateWorkflow';
+import WorkflowDetail from './pages/WorkflowDetail';
+import Settings from './pages/Settings';
+import useAuthStore from './stores/authStore';
+import useThemeStore from './stores/themeStore';
+
+// Protected Route wrapper
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+// Public Route wrapper (redirects to dashboard if authenticated)
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuthStore();
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 function App() {
+  const { initTheme } = useThemeStore();
+
+  // Initialize theme on app load
+  React.useEffect(() => {
+    initTheme();
+  }, [initTheme]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <BrowserRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
+
+        {/* Protected routes with layout */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/workflows" element={<Workflows />} />
+          <Route path="/create-workflow" element={<CreateWorkflow />} />
+          <Route path="/workflow/:id" element={<WorkflowDetail />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+
+        {/* Catch all - redirect to dashboard or login */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
