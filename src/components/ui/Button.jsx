@@ -11,14 +11,14 @@ const Button = ({
   type = 'button',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-2xl transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variants = {
     primary: 'bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] focus:ring-[var(--primary)]',
-    secondary: 'bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--surface-hover)] focus:ring-[var(--secondary)]',
+    secondary: 'bg-[#F6F5FA] text-[var(--text-primary)] border border-[#D8DFE9] hover:border-[#CFDECA] focus:ring-[var(--secondary)]',
     ghost: 'bg-transparent text-[var(--text-primary)] hover:bg-[var(--surface-hover)] focus:ring-[var(--secondary)]',
     danger: 'bg-[var(--error)] text-white hover:bg-[var(--error-hover)] focus:ring-[var(--error)]',
-    success: 'bg-[var(--success)] text-white hover:bg-[var(--success-hover)] focus:ring-[var(--success)]',
+    success: 'bg-[#CFDECA] text-[#212121] hover:bg-[#BECFB8] focus:ring-[#CFDECA]',
   };
 
   const sizes = {

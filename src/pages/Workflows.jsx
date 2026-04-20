@@ -1,12 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, GitBranch, Play, Pause, MoreVertical, Trash2, Eye, Edit } from 'lucide-react';
-import useWorkflowStore from '../stores/workflowStore';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import Badge from '../components/ui/Badge';
+import {
+  ArrowRight,
+  Clock,
+  Edit,
+  Eye,
+  GitBranch,
+  MoreVertical,
+  Pause,
+  Play,
+  Plus,
+  Search,
+  Trash2,
+} from 'lucide-react';
 import Modal from '../components/ui/Modal';
+import useWorkflowStore from '../stores/workflowStore';
 
 const Workflows = () => {
   const navigate = useNavigate();
@@ -15,227 +23,276 @@ const Workflows = () => {
   const [statusFilter, setStatusFilter] = React.useState('all');
   const [deleteModal, setDeleteModal] = React.useState({ open: false, workflow: null });
 
-  // Filter workflows
   const filteredWorkflows = React.useMemo(() => {
     let result = workflows;
 
     if (statusFilter !== 'all') {
-      result = result.filter((w) => w.status === statusFilter);
+      result = result.filter((workflow) => workflow.status === statusFilter);
     }
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
-        (w) =>
-          w.name.toLowerCase().includes(query) ||
-          w.description?.toLowerCase().includes(query)
+        (workflow) =>
+          workflow.name.toLowerCase().includes(query) ||
+          workflow.description?.toLowerCase().includes(query)
       );
     }
 
     return result;
   }, [workflows, statusFilter, searchQuery]);
 
-  const handleDelete = () => {
-    if (deleteModal.workflow) {
-      deleteWorkflow(deleteModal.workflow.id);
-      setDeleteModal({ open: false, workflow: null });
-    }
-  };
+  const stats = React.useMemo(() => {
+    const total = workflows.length;
+    const active = workflows.filter((workflow) => workflow.status === 'active').length;
+    const executions = workflows.reduce((acc, workflow) => acc + (workflow.executions?.length || 0), 0);
+    return { total, active, executions };
+  }, [workflows]);
 
-  const handleToggleStatus = (workflow) => {
-    toggleWorkflowStatus(workflow.id);
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+
+    if (diff < 1) return 'Less than 1 hour ago';
+    if (diff < 24) return `${diff} hour${diff === 1 ? '' : 's'} ago`;
+    return date.toLocaleDateString();
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-5 font-urbanist">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Workflows</h1>
-          <p className="text-[var(--text-secondary)] mt-1">
-            Manage and monitor your automation workflows
+          <h1 className="text-3xl font-bold text-[#212121]">Workflows</h1>
+          <p className="mt-1 text-sm text-[#5C5C5C]">
+            Build and operate enterprise automations with controlled branching, retry logic, and execution history.
           </p>
         </div>
-        <Button onClick={() => navigate('/create-workflow')}>
-          <Plus size={18} className="mr-2" />
-          New Workflow
-        </Button>
+        <button
+          type="button"
+          onClick={() => navigate('/create-workflow')}
+          className="inline-flex items-center gap-2 rounded-2xl bg-[#212121] px-5 py-3 text-sm font-semibold text-white hover:bg-[#3A3A3A]"
+        >
+          <Plus size={16} />
+          Create Workflow
+        </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
-          <Input
-            placeholder="Search workflows..."
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="enterprise-card p-5">
+          <p className="text-sm text-[#5C5C5C]">Total Workflows</p>
+          <p className="mt-2 text-3xl font-bold text-[#212121]">{stats.total}</p>
+        </div>
+        <div className="enterprise-card p-5">
+          <p className="text-sm text-[#5C5C5C]">Active Scenarios</p>
+          <p className="mt-2 text-3xl font-bold text-[#212121]">{stats.active}</p>
+        </div>
+        <div className="enterprise-card p-5">
+          <p className="text-sm text-[#5C5C5C]">Execution Count</p>
+          <p className="mt-2 text-3xl font-bold text-[#212121]">{stats.executions.toLocaleString()}</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 md:flex-row">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A8A8A]" />
+          <input
+            type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            icon={Search}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search workflows"
+            className="w-full rounded-2xl border border-[#D8DFE9] bg-white py-3 pl-10 pr-4 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none"
           />
         </div>
         <div className="flex gap-2">
           {['all', 'active', 'inactive'].map((status) => (
-            <Button
+            <button
               key={status}
-              variant={statusFilter === status ? 'primary' : 'secondary'}
-              size="sm"
+              type="button"
               onClick={() => setStatusFilter(status)}
+              className={[
+                'rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors',
+                statusFilter === status
+                  ? 'border-[#212121] bg-[#212121] text-white'
+                  : 'border-[#D8DFE9] bg-white text-[#5C5C5C] hover:border-[#CFDECA]',
+              ].join(' ')}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Workflows Grid */}
       {filteredWorkflows.length === 0 ? (
-        <Card className="p-12">
-          <div className="text-center">
-            <GitBranch className="w-12 h-12 mx-auto mb-4 text-[var(--text-muted)]" />
-            <h3 className="text-lg font-medium text-[var(--text-primary)] mb-2">
-              {workflows.length === 0 ? 'No workflows yet' : 'No workflows match your search'}
-            </h3>
-            <p className="text-[var(--text-secondary)] mb-4">
-              {workflows.length === 0
-                ? 'Create your first workflow to start automating tasks'
-                : 'Try adjusting your search or filters'}
-            </p>
-            {workflows.length === 0 && (
-              <Button onClick={() => navigate('/create-workflow')}>
-                <Plus size={18} className="mr-2" />
-                Create Workflow
-              </Button>
-            )}
+        <section className="enterprise-card p-10 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#D8DFE9] bg-white">
+            <GitBranch size={24} className="text-[#5C5C5C]" />
           </div>
-        </Card>
+          <h2 className="mt-4 text-lg font-semibold text-[#212121]">No workflows found</h2>
+          <p className="mt-1 text-sm text-[#5C5C5C]">Adjust your filters or create a new workflow.</p>
+        </section>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredWorkflows.map((workflow) => (
             <WorkflowCard
               key={workflow.id}
               workflow={workflow}
               onView={() => navigate(`/workflow/${workflow.id}`)}
               onEdit={() => navigate(`/create-workflow?id=${workflow.id}`)}
-              onToggle={() => handleToggleStatus(workflow)}
+              onToggle={() => toggleWorkflowStatus(workflow.id)}
               onDelete={() => setDeleteModal({ open: true, workflow })}
+              formatDate={formatDate}
             />
           ))}
-        </div>
+        </section>
       )}
 
-      {/* Delete Confirmation Modal */}
       <Modal
         isOpen={deleteModal.open}
         onClose={() => setDeleteModal({ open: false, workflow: null })}
         title="Delete Workflow"
       >
-        <p className="text-[var(--text-secondary)] mb-6">
-          Are you sure you want to delete <strong>"{deleteModal.workflow?.name}"</strong>? This action
-          cannot be undone.
+        <p className="mb-5 text-sm text-[#5C5C5C]">
+          Delete <strong className="text-[#212121]">{deleteModal.workflow?.name}</strong>? This action cannot be undone.
         </p>
-        <div className="flex justify-end gap-3">
-          <Button variant="secondary" onClick={() => setDeleteModal({ open: false, workflow: null })}>
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setDeleteModal({ open: false, workflow: null })}
+            className="rounded-xl border border-[#D8DFE9] bg-white px-4 py-2 text-sm font-semibold text-[#5C5C5C] hover:border-[#CFDECA]"
+          >
             Cancel
-          </Button>
-          <Button variant="danger" onClick={handleDelete}>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (deleteModal.workflow) {
+                deleteWorkflow(deleteModal.workflow.id);
+              }
+              setDeleteModal({ open: false, workflow: null });
+            }}
+            className="rounded-xl bg-[#EF4444] px-4 py-2 text-sm font-semibold text-white hover:bg-[#DC2626]"
+          >
             Delete
-          </Button>
+          </button>
         </div>
       </Modal>
     </div>
   );
 };
 
-const WorkflowCard = ({ workflow, onView, onEdit, onToggle, onDelete }) => {
+const WorkflowCard = ({ workflow, onView, onEdit, onToggle, onDelete, formatDate }) => {
   const [showMenu, setShowMenu] = React.useState(false);
 
   return (
-    <Card hoverable className="overflow-hidden">
-      <div className="p-4">
-        <div className="flex items-start justify-between mb-3">
+    <article className="enterprise-card overflow-hidden">
+      <div className="p-5">
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[var(--primary)] bg-opacity-10 flex items-center justify-center">
-              <GitBranch className="w-5 h-5 text-[var(--primary)]" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#D8DFE9] bg-[#CFDECA]">
+              <GitBranch size={18} className="text-[#212121]" />
             </div>
             <div>
-              <h3 className="font-medium text-[var(--text-primary)]">{workflow.name}</h3>
-              <Badge variant={workflow.status === 'active' ? 'active' : 'inactive'} className="mt-1">
-                {workflow.status}
-              </Badge>
+              <p className="text-sm font-semibold text-[#212121]">{workflow.name}</p>
+              <span
+                className={[
+                  'inline-flex rounded-full px-2 py-1 text-[11px] font-semibold',
+                  workflow.status === 'active' ? 'bg-[#CFDECA] text-[#212121]' : 'bg-white text-[#5C5C5C] border border-[#D8DFE9]',
+                ].join(' ')}
+              >
+                {workflow.status === 'active' ? 'Running' : 'Paused'}
+              </span>
             </div>
           </div>
+
           <div className="relative">
             <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="p-1 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
+              type="button"
+              onClick={() => setShowMenu((prev) => !prev)}
+              className="rounded-lg p-1.5 text-[#5C5C5C] hover:bg-white"
             >
-              <MoreVertical size={18} />
+              <MoreVertical size={16} />
             </button>
+
             {showMenu && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 mt-1 w-40 bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-lg z-20">
-                  <button
-                    onClick={() => {
-                      setShowMenu(false);
-                      onView();
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)]"
-                  >
-                    <Eye size={16} /> View
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowMenu(false);
-                      onEdit();
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)]"
-                  >
-                    <Edit size={16} /> Edit
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowMenu(false);
-                      onToggle();
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)]"
-                  >
-                    {workflow.status === 'active' ? <Pause size={16} /> : <Play size={16} />}
-                    {workflow.status === 'active' ? 'Disable' : 'Enable'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowMenu(false);
-                      onDelete();
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--error)] hover:bg-[var(--surface-hover)]"
-                  >
-                    <Trash2 size={16} /> Delete
-                  </button>
-                </div>
-              </>
+              <div className="absolute right-0 z-10 mt-1 w-44 rounded-xl border border-[#D8DFE9] bg-white p-1 shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMenu(false);
+                    onView();
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#212121] hover:bg-[#F6F5FA]"
+                >
+                  <Eye size={14} />
+                  View
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMenu(false);
+                    onEdit();
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#212121] hover:bg-[#F6F5FA]"
+                >
+                  <Edit size={14} />
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMenu(false);
+                    onToggle();
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#212121] hover:bg-[#F6F5FA]"
+                >
+                  {workflow.status === 'active' ? <Pause size={14} /> : <Play size={14} />}
+                  {workflow.status === 'active' ? 'Disable' : 'Enable'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMenu(false);
+                    onDelete();
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#EF4444] hover:bg-red-50"
+                >
+                  <Trash2 size={14} />
+                  Delete
+                </button>
+              </div>
             )}
           </div>
         </div>
 
-        <p className="text-sm text-[var(--text-secondary)] mb-4 line-clamp-2">
-          {workflow.description || 'No description'}
+        <p className="mt-4 text-sm text-[#5C5C5C]">
+          {workflow.description || 'No description has been provided for this workflow.'}
         </p>
 
-        <div className="flex items-center justify-between text-sm text-[var(--text-muted)]">
-          <span>{workflow.nodes?.length || 0} nodes</span>
-          <span>{workflow.executions?.length || 0} runs</span>
+        <div className="mt-4 flex items-center justify-between text-xs text-[#5C5C5C]">
+          <span className="inline-flex items-center gap-1">
+            <GitBranch size={12} />
+            {workflow.nodes?.length || 0} nodes
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Clock size={12} />
+            {formatDate(workflow.lastExecution)}
+          </span>
         </div>
       </div>
 
-      <div className="px-4 py-3 bg-[var(--surface-hover)] border-t border-[var(--border)]">
+      <div className="border-t border-[#D8DFE9] px-5 py-3">
         <button
+          type="button"
           onClick={onView}
-          className="text-sm text-[var(--primary)] hover:underline font-medium"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[#212121] hover:text-[#3A3A3A]"
         >
-          View Details
+          Open Workflow
+          <ArrowRight size={14} />
         </button>
       </div>
-    </Card>
+    </article>
   );
 };
 

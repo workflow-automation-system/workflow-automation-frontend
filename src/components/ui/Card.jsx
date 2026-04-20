@@ -1,8 +1,8 @@
 import React from 'react';
 
 const Card = ({ children, className = '', onClick, hoverable = false, ...props }) => {
-  const baseStyles = 'bg-[var(--surface)] rounded-lg border border-[var(--border)] shadow-sm';
-  const hoverStyles = hoverable ? 'cursor-pointer transition-shadow hover:shadow-md' : '';
+  const baseStyles = 'enterprise-card rounded-[20px]';
+  const hoverStyles = hoverable ? 'cursor-pointer' : '';
 
   return (
     <div
@@ -16,19 +16,19 @@ const Card = ({ children, className = '', onClick, hoverable = false, ...props }
 };
 
 Card.Header = ({ children, className = '' }) => (
-  <div className={`px-4 py-3 border-b border-[var(--border)] ${className}`}>
+  <div className={`px-5 py-4 border-b border-[var(--border)] ${className}`}>
     {children}
   </div>
 );
 
 Card.Body = ({ children, className = '' }) => (
-  <div className={`px-4 py-4 ${className}`}>
+  <div className={`px-5 py-5 ${className}`}>
     {children}
   </div>
 );
 
 Card.Footer = ({ children, className = '' }) => (
-  <div className={`px-4 py-3 border-t border-[var(--border)] bg-[var(--surface-hover)] rounded-b-lg ${className}`}>
+  <div className={`px-5 py-4 border-t border-[var(--border)] bg-[var(--surface-hover)] rounded-b-[20px] ${className}`}>
     {children}
   </div>
 );

@@ -1,15 +1,12 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Workflow, Sun, Moon } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Check, Lock, Mail, Moon, Sun, User, Workflow } from 'lucide-react';
 import useAuthStore from '../../stores/authStore';
 import useThemeStore from '../../stores/themeStore';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import Card from '../../components/ui/Card';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register, isLoading, error, clearError, isAuthenticated } = useAuthStore();
+  const { clearError, error, isAuthenticated, isLoading, register } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
   const [formData, setFormData] = React.useState({
     name: '',
@@ -19,173 +16,147 @@ const Register = () => {
   });
   const [formErrors, setFormErrors] = React.useState({});
 
-  // Redirect if already authenticated
   React.useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/');
-    }
+    if (isAuthenticated) navigate('/');
   }, [isAuthenticated, navigate]);
 
-  // Clear errors on mount
   React.useEffect(() => {
     clearError();
   }, [clearError]);
 
-  const validateForm = () => {
+  const validate = () => {
     const errors = {};
-
-    if (!formData.name) {
-      errors.name = 'Name is required';
-    } else if (formData.name.length < 2) {
-      errors.name = 'Name must be at least 2 characters';
-    }
-
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Invalid email format';
-    }
-
-    if (!formData.password) {
-      errors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
-
-    if (!formData.confirmPassword) {
-      errors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-    }
-
+    if (!formData.name.trim()) errors.name = 'Full name is required';
+    if (!formData.email.trim()) errors.email = 'Email is required';
+    if (!formData.password) errors.password = 'Password is required';
+    if (formData.password !== formData.confirmPassword) errors.confirmPassword = 'Passwords do not match';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!validate()) return;
     const result = await register(formData.email, formData.password, formData.name);
-    if (result.success) {
-      navigate('/');
-    }
+    if (result.success) navigate('/');
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear field error when user starts typing
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
+  const featureList = [
+    'Unlimited workflow executions',
+    'Node-based visual workflow builder',
+    'Secure API integrations and webhooks',
+    'Enterprise governance controls',
+  ];
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex flex-col">
-      {/* Theme toggle */}
-      <button
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors"
-      >
-        {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-      </button>
-
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-[var(--primary)] mb-4">
-              <Workflow size={32} className="text-white" />
+    <div className="min-h-screen bg-[#F6F5FA] font-urbanist lg:grid lg:grid-cols-2">
+      <section className="hidden bg-gradient-to-br from-[#D8DFE9] to-[#CFDECA] p-12 lg:flex lg:flex-col lg:justify-between">
+        <div>
+          <div className="mb-12 flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-soft">
+              <Workflow size={24} className="text-[#212121]" />
             </div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">Create Account</h1>
-            <p className="text-[var(--text-secondary)] mt-2">
-              Get started with FlowForge
-            </p>
+            <span className="text-2xl font-bold text-[#212121]">FlowForge</span>
+          </div>
+          <h1 className="text-4xl font-bold leading-tight text-[#212121]">Start Building Enterprise Automations</h1>
+          <p className="mt-4 max-w-md text-lg text-[#5C5C5C]">
+            Launch governed workflows with advanced branching, retries, and operational observability.
+          </p>
+          <div className="mt-8 space-y-2">
+            {featureList.map((feature) => (
+              <div key={feature} className="flex items-center gap-2">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#CFDECA]">
+                  <Check size={14} className="text-[#212121]" />
+                </div>
+                <span className="text-sm font-medium text-[#212121]">{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative flex items-center justify-center p-6">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="absolute right-6 top-6 rounded-xl border border-[#D8DFE9] bg-white p-2 text-[#5C5C5C] hover:border-[#CFDECA]"
+        >
+          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
+
+        <div className="w-full max-w-md">
+          <div className="mb-8 text-center lg:hidden">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#CFDECA]">
+              <Workflow size={26} className="text-[#212121]" />
+            </div>
+            <h1 className="mt-3 text-2xl font-bold text-[#212121]">FlowForge</h1>
           </div>
 
-          {/* Register Form */}
-          <Card>
-            <Card.Body>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {error && (
-                  <div className="p-3 rounded-lg bg-[var(--error)] bg-opacity-10 border border-[var(--error)] text-[var(--error)] text-sm">
-                    {error}
-                  </div>
-                )}
+          <h2 className="text-2xl font-bold text-[#212121]">Create account</h2>
+          <p className="mt-1 text-sm text-[#5C5C5C]">Provision your workspace and start building workflows.</p>
 
-                <Input
-                  label="Full Name"
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter your name"
-                  icon={User}
-                  error={formErrors.name}
-                  required
-                />
+          <form onSubmit={handleSubmit} className="enterprise-card mt-6 space-y-4 p-6">
+            {error && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#EF4444]">{error}</div>}
 
-                <Input
-                  label="Email"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  icon={Mail}
-                  error={formErrors.email}
-                  required
-                />
+            <Field label="Full Name" icon={User} value={formData.name} onChange={(value) => setFormData((prev) => ({ ...prev, name: value }))} />
+            {formErrors.name && <span className="-mt-2 block text-xs text-[#EF4444]">{formErrors.name}</span>}
 
-                <Input
-                  label="Password"
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Create a password"
-                  icon={Lock}
-                  error={formErrors.password}
-                  required
-                />
+            <Field label="Email" icon={Mail} value={formData.email} onChange={(value) => setFormData((prev) => ({ ...prev, email: value }))} />
+            {formErrors.email && <span className="-mt-2 block text-xs text-[#EF4444]">{formErrors.email}</span>}
 
-                <Input
-                  label="Confirm Password"
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm your password"
-                  icon={Lock}
-                  error={formErrors.confirmPassword}
-                  required
-                />
+            <Field
+              label="Password"
+              icon={Lock}
+              type="password"
+              value={formData.password}
+              onChange={(value) => setFormData((prev) => ({ ...prev, password: value }))}
+            />
+            {formErrors.password && <span className="-mt-2 block text-xs text-[#EF4444]">{formErrors.password}</span>}
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="w-full"
-                  loading={isLoading}
-                  disabled={isLoading}
-                >
-                  Create Account
-                </Button>
-              </form>
-            </Card.Body>
-          </Card>
+            <Field
+              label="Confirm Password"
+              icon={Lock}
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(value) => setFormData((prev) => ({ ...prev, confirmPassword: value }))}
+            />
+            {formErrors.confirmPassword && <span className="-mt-2 block text-xs text-[#EF4444]">{formErrors.confirmPassword}</span>}
 
-          {/* Sign in link */}
-          <p className="text-center mt-6 text-[var(--text-secondary)]">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#212121] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#3A3A3A] disabled:opacity-60"
+            >
+              {isLoading ? 'Creating account...' : 'Create Account'}
+              <ArrowRight size={14} />
+            </button>
+          </form>
+
+          <p className="mt-5 text-center text-sm text-[#5C5C5C]">
             Already have an account?{' '}
-            <Link to="/login" className="text-[var(--primary)] hover:underline font-medium">
+            <Link to="/login" className="font-semibold text-[#212121] hover:underline">
               Sign in
             </Link>
           </p>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
+
+const Field = ({ label, icon: Icon, value, onChange, type = 'text' }) => (
+  <label className="block">
+    <span className="mb-1 block text-sm font-medium text-[#5C5C5C]">{label}</span>
+    <div className="relative">
+      <Icon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A8A8A]" />
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-full rounded-xl border border-[#D8DFE9] bg-white py-2.5 pl-9 pr-3 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none"
+      />
+    </div>
+  </label>
+);
 
 export default Register;

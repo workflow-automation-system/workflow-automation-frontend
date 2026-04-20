@@ -22,7 +22,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div
-          className={`relative bg-[var(--background)] rounded-xl shadow-xl w-full ${sizes[size]} transform transition-all`}
+          className={`relative bg-[#F6F5FA] border border-[#D8DFE9] rounded-3xl shadow-xl w-full ${sizes[size]} transform transition-all`}
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
@@ -31,7 +31,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
             </h3>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors"
+              className="p-1 rounded-lg text-[var(--text-secondary)] hover:bg-white transition-colors"
             >
               <X size={20} />
             </button>

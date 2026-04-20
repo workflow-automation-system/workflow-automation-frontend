@@ -4,7 +4,10 @@ import MainLayout from './components/layout/MainLayout';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/Dashboard';
+import Organisation from './pages/Organisation';
 import Workflows from './pages/Workflows';
+import AppConnections from './pages/AppConnections';
+import Templates from './pages/Templates';
 import CreateWorkflow from './pages/CreateWorkflow';
 import WorkflowDetail from './pages/WorkflowDetail';
 import Settings from './pages/Settings';
@@ -71,7 +74,10 @@ function App() {
           }
         >
           <Route path="/" element={<Dashboard />} />
+          <Route path="/organisation" element={<Organisation />} />
           <Route path="/workflows" element={<Workflows />} />
+          <Route path="/app-connections" element={<AppConnections />} />
+          <Route path="/templates" element={<Templates />} />
           <Route path="/create-workflow" element={<CreateWorkflow />} />
           <Route path="/workflow/:id" element={<WorkflowDetail />} />
           <Route path="/settings" element={<Settings />} />

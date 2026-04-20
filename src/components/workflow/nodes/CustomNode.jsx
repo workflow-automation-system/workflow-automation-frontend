@@ -1,76 +1,115 @@
 import React from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Zap, Mail, Globe, Clock } from 'lucide-react';
+import {
+  BookCopy,
+  Bot,
+  Clock,
+  GitBranch,
+  Globe,
+  Mail,
+  MessageSquare,
+  Sheet,
+  ShieldAlert,
+  Table2,
+  Zap,
+} from 'lucide-react';
 import { nodeTypes } from '../../../mock/data';
 
 const iconMap = {
   Zap,
+  GitBranch,
+  Table2,
+  ShieldAlert,
+  BookCopy,
+  Sheet,
+  Bot,
+  MessageSquare,
   Mail,
   Globe,
   Clock,
 };
 
-const CustomNode = ({ data, selected }) => {
-  const nodeConfig = nodeTypes.find((n) => n.type === data?.type);
+const nodeBg = {
+  trigger: '#EFF0A3',
+  condition: '#D8DFE9',
+  data_mapper: '#D8DFE9',
+  error_handler: '#EFF0A3',
+  notion: '#CFDECA',
+  google_sheets: '#CFDECA',
+  chatgpt: '#CFDECA',
+  slack: '#CFDECA',
+  email: '#CFDECA',
+  webhook: '#D8DFE9',
+  delay: '#F6F5FA',
+};
+
+const getSubtitle = (type, data) => {
+  switch (type) {
+    case 'trigger':
+      return data?.eventType || 'Manual event';
+    case 'condition':
+      return data?.expression || 'branch expression';
+    case 'data_mapper':
+      return data?.mappingMode || 'strict mapping';
+    case 'error_handler':
+      return data?.policy || 'retry policy';
+    case 'notion':
+      return data?.action || 'create page';
+    case 'google_sheets':
+      return data?.worksheet || 'Sheet1';
+    case 'chatgpt':
+      return data?.model || 'gpt model';
+    case 'slack':
+      return data?.channel || '#channel';
+    case 'email':
+      return data?.to || 'recipient';
+    case 'webhook':
+      return data?.method || 'GET';
+    case 'delay':
+      return data?.duration ? `${data.duration} ${data.unit}` : '5 minutes';
+    default:
+      return 'Configure node';
+  }
+};
+
+const CustomNode = ({ data, selected, type }) => {
+  const nodeConfig = nodeTypes.find((node) => node.type === type);
   const Icon = iconMap[nodeConfig?.icon] || Zap;
-  const color = nodeConfig?.color || '#3b82f6';
 
   return (
     <div
-      className={`
-        px-4 py-3 rounded-lg border-2 bg-[var(--surface)] min-w-[180px]
-        ${selected ? 'border-[var(--primary)] shadow-lg' : 'border-[var(--border)]'}
-      `}
+      className={[
+        'min-w-[230px] rounded-2xl border bg-[#F6F5FA] px-4 py-3 shadow-card transition-all',
+        selected ? 'border-[#CFDECA] ring-2 ring-[#CFDECA]/40' : 'border-[#D8DFE9]',
+      ].join(' ')}
     >
-      {/* Input Handle */}
-      {data?.type !== 'trigger' && (
+      {type !== 'trigger' && (
         <Handle
           type="target"
           position={Position.Left}
-          className="!w-3 !h-3 !bg-[var(--primary)] !border-2 !border-[var(--background)]"
+          className="!h-3 !w-3 !border-2 !border-white !bg-[#CFDECA]"
         />
       )}
 
-      {/* Node Content */}
       <div className="flex items-center gap-3">
         <div
-          className="w-9 h-9 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: `${color}20` }}
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#D8DFE9]"
+          style={{ backgroundColor: nodeBg[type] || '#CFDECA' }}
         >
-          <Icon size={18} style={{ color }} />
+          <Icon size={16} className="text-[#212121]" />
         </div>
-        <div className="flex-1">
-          <h4 className="text-sm font-medium text-[var(--text-primary)]">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-[#212121]">
             {data?.label || nodeConfig?.label || 'Node'}
-          </h4>
-          {data?.type === 'trigger' && data?.eventType && (
-            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              {data.eventType}
-            </p>
-          )}
-          {data?.type === 'email' && data?.to && (
-            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              {data.to}
-            </p>
-          )}
-          {data?.type === 'webhook' && data?.method && (
-            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              {data.method} Request
-            </p>
-          )}
-          {data?.type === 'delay' && data?.duration && (
-            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              {data.duration} {data.unit}
-            </p>
-          )}
+          </p>
+          <p className="truncate text-xs text-[#5C5C5C]">{getSubtitle(type, data)}</p>
         </div>
       </div>
 
-      {/* Output Handle */}
       <Handle
         type="source"
         position={Position.Right}
-        className="!w-3 !h-3 !bg-[var(--primary)] !border-2 !border-[var(--background)]"
+        className="!h-3 !w-3 !border-2 !border-white !bg-[#CFDECA]"
       />
     </div>
   );

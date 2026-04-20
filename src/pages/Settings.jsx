@@ -1,266 +1,231 @@
 import React from 'react';
-import { Sun, Moon, Monitor, User, Key, Webhook, Bell, Shield } from 'lucide-react';
+import { Bell, Building2, Check, Copy, KeyRound, Monitor, Moon, Shield, Sun } from 'lucide-react';
 import useAuthStore from '../stores/authStore';
 import useThemeStore from '../stores/themeStore';
-import Card from '../components/ui/Card';
-import Input from '../components/ui/Input';
-import Toggle from '../components/ui/Toggle';
-import Button from '../components/ui/Button';
-import Badge from '../components/ui/Badge';
 
 const Settings = () => {
   const { user } = useAuthStore();
-  const { theme, setTheme } = useThemeStore();
+  const { setTheme, theme } = useThemeStore();
+  const [copied, setCopied] = React.useState(null);
   const [notifications, setNotifications] = React.useState({
-    email: true,
+    failures: true,
+    summary: true,
     push: false,
-    workflowFailures: true,
   });
 
+  const copy = (value, key) => {
+    navigator.clipboard.writeText(value);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 1500);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Page Header */}
+    <div className="mx-auto max-w-6xl space-y-5 font-urbanist">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Settings</h1>
-        <p className="text-[var(--text-secondary)] mt-1">
-          Manage your account and application preferences
-        </p>
+        <h1 className="text-3xl font-bold text-[#212121]">Settings</h1>
+        <p className="mt-1 text-sm text-[#5C5C5C]">Manage profile, billing, API keys, and platform security preferences.</p>
       </div>
 
-      {/* Profile Section */}
-      <Card>
-        <Card.Header>
+      <section className="enterprise-card overflow-hidden">
+        <div className="border-b border-[#D8DFE9] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#212121]">Profile</h2>
+        </div>
+        <div className="grid gap-4 p-5 md:grid-cols-[auto_1fr]">
+          <div className="flex h-20 w-20 items-center justify-center rounded-3xl border border-[#D8DFE9] bg-[#D8DFE9] text-2xl font-bold text-[#212121]">
+            {user?.name?.charAt(0).toUpperCase() || 'U'}
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <Field label="Display Name" value={user?.name || 'User'} />
+            <Field label="Email Address" value={user?.email || 'user@company.com'} />
+          </div>
+        </div>
+      </section>
+
+      <section className="enterprise-card p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
-            <User className="w-5 h-5 text-[var(--primary)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">Profile</h2>
-          </div>
-        </Card.Header>
-        <Card.Body className="space-y-4">
-          <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-full bg-[var(--primary)] flex items-center justify-center text-white text-2xl font-bold">
-              {user?.name?.charAt(0).toUpperCase() || 'U'}
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#D8DFE9] bg-[#CFDECA]">
+              <Building2 size={18} className="text-[#212121]" />
             </div>
-            <div className="flex-1">
-              <Input
-                label="Display Name"
-                value={user?.name || ''}
-                onChange={() => {}}
-                disabled
-              />
-              <p className="text-sm text-[var(--text-muted)] mt-1">
-                Contact support to change your name
-              </p>
+            <div>
+              <h2 className="text-lg font-semibold text-[#212121]">Enterprise Plan</h2>
+              <p className="text-sm text-[#5C5C5C]">Unlimited workflows, priority support, and advanced governance controls.</p>
             </div>
           </div>
-          <Input
-            label="Email Address"
-            type="email"
-            value={user?.email || ''}
-            onChange={() => {}}
-            disabled
+          <div className="text-right">
+            <p className="text-2xl font-bold text-[#212121]">$299/mo</p>
+            <button type="button" className="mt-2 rounded-xl border border-[#D8DFE9] bg-white px-3 py-2 text-sm font-semibold text-[#212121] hover:border-[#CFDECA]">
+              Manage Billing
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="enterprise-card overflow-hidden">
+        <div className="border-b border-[#D8DFE9] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#212121]">Appearance</h2>
+          <p className="text-sm text-[#5C5C5C]">Choose how the workspace should appear.</p>
+        </div>
+        <div className="grid gap-3 p-5 sm:grid-cols-3">
+          <ThemeCard icon={Sun} label="Light" active={theme === 'light'} onClick={() => setTheme('light')} />
+          <ThemeCard icon={Moon} label="Dark" active={theme === 'dark'} onClick={() => setTheme('dark')} />
+          <ThemeCard icon={Monitor} label="System" active={theme === 'system'} onClick={() => setTheme('system')} />
+        </div>
+      </section>
+
+      <section className="enterprise-card overflow-hidden">
+        <div className="border-b border-[#D8DFE9] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#212121]">API & Webhooks</h2>
+        </div>
+        <div className="space-y-4 p-5">
+          <SecretField
+            icon={KeyRound}
+            label="API Key"
+            value="sk_live_****************************"
+            onCopy={() => copy('sk_live_example', 'api_key')}
+            copied={copied === 'api_key'}
           />
-        </Card.Body>
-      </Card>
-
-      {/* Appearance Section */}
-      <Card>
-        <Card.Header>
-          <div className="flex items-center gap-3">
-            {theme === 'light' ? <Sun className="w-5 h-5 text-[var(--primary)]" /> : <Moon className="w-5 h-5 text-[var(--primary)]" />}
-            <h2 className="font-semibold text-[var(--text-primary)]">Appearance</h2>
-          </div>
-        </Card.Header>
-        <Card.Body>
-          <p className="text-sm text-[var(--text-secondary)] mb-4">
-            Choose how FlowForge looks to you
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <button
-              onClick={() => setTheme('light')}
-              className={`p-4 rounded-lg border-2 transition-all ${
-                theme === 'light'
-                  ? 'border-[var(--primary)] bg-[var(--primary)] bg-opacity-5'
-                  : 'border-[var(--border)] hover:border-[var(--border-hover)]'
-              }`}
-            >
-              <div className="w-full aspect-video bg-white rounded mb-3 border border-gray-200" />
-              <div className="flex items-center justify-center gap-2">
-                <Sun size={16} />
-                <span className="font-medium">Light</span>
-              </div>
-            </button>
-            <button
-              onClick={() => setTheme('dark')}
-              className={`p-4 rounded-lg border-2 transition-all ${
-                theme === 'dark'
-                  ? 'border-[var(--primary)] bg-[var(--primary)] bg-opacity-5'
-                  : 'border-[var(--border)] hover:border-[var(--border-hover)]'
-              }`}
-            >
-              <div className="w-full aspect-video bg-slate-800 rounded mb-3 border border-slate-700" />
-              <div className="flex items-center justify-center gap-2">
-                <Moon size={16} />
-                <span className="font-medium">Dark</span>
-              </div>
-            </button>
-            <button
-              onClick={() => setTheme('system')}
-              className={`p-4 rounded-lg border-2 transition-all ${
-                theme === 'system'
-                  ? 'border-[var(--primary)] bg-[var(--primary)] bg-opacity-5'
-                  : 'border-[var(--border)] hover:border-[var(--border-hover)]'
-              }`}
-            >
-              <div className="w-full aspect-video bg-gradient-to-r from-white to-slate-800 rounded mb-3 border border-gray-200" />
-              <div className="flex items-center justify-center gap-2">
-                <Monitor size={16} />
-                <span className="font-medium">System</span>
-              </div>
-            </button>
-          </div>
-        </Card.Body>
-      </Card>
-
-      {/* API Configuration */}
-      <Card>
-        <Card.Header>
-          <div className="flex items-center gap-3">
-            <Key className="w-5 h-5 text-[var(--primary)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">API Configuration</h2>
-          </div>
-        </Card.Header>
-        <Card.Body className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-              API Key
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value="sk_live_****************************"
-                onChange={() => {}}
-                disabled
-                className="flex-1"
-              />
-              <Button variant="secondary">Regenerate</Button>
-            </div>
-            <p className="text-sm text-[var(--text-muted)] mt-1">
-              Used for API authentication. Keep this secret.
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-              Webhook URL
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value="https://api.flowforge.io/webhooks/****************************"
-                onChange={() => {}}
-                disabled
-                className="flex-1"
-              />
-              <Button variant="secondary">Copy</Button>
-            </div>
-            <p className="text-sm text-[var(--text-muted)] mt-1">
-              Send POST requests to this URL to trigger workflows.
-            </p>
-          </div>
-        </Card.Body>
-      </Card>
-
-      {/* Integrations */}
-      <Card>
-        <Card.Header>
-          <div className="flex items-center gap-3">
-            <Webhook className="w-5 h-5 text-[var(--primary)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">Integrations</h2>
-          </div>
-        </Card.Header>
-        <Card.Body>
-          <div className="space-y-4">
-            {[
-              { name: 'Email Service (SMTP)', status: 'connected', icon: '📧' },
-              { name: 'Slack', status: 'disconnected', icon: '💬' },
-              { name: 'GitHub', status: 'disconnected', icon: '🐙' },
-              { name: 'Jira', status: 'disconnected', icon: '📋' },
-            ].map((integration) => (
-              <div
-                key={integration.name}
-                className="flex items-center justify-between p-3 rounded-lg bg-[var(--surface-hover)]"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">{integration.icon}</span>
-                  <span className="font-medium text-[var(--text-primary)]">
-                    {integration.name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant={integration.status === 'connected' ? 'success' : 'default'}>
-                    {integration.status}
-                  </Badge>
-                  <Button variant="secondary" size="sm">
-                    {integration.status === 'connected' ? 'Configure' : 'Connect'}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card.Body>
-      </Card>
-
-      {/* Notifications */}
-      <Card>
-        <Card.Header>
-          <div className="flex items-center gap-3">
-            <Bell className="w-5 h-5 text-[var(--primary)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">Notifications</h2>
-          </div>
-        </Card.Header>
-        <Card.Body className="space-y-4">
-          <Toggle
-            checked={notifications.email}
-            onChange={(checked) =>
-              setNotifications((prev) => ({ ...prev, email: checked }))
-            }
-            label="Email notifications for workflow failures"
+          <SecretField
+            icon={KeyRound}
+            label="Webhook URL"
+            value="https://api.flowforge.io/webhooks/wh_****************************"
+            onCopy={() => copy('https://api.flowforge.io/webhooks/example', 'webhook')}
+            copied={copied === 'webhook'}
           />
-          <Toggle
-            checked={notifications.push}
-            onChange={(checked) =>
-              setNotifications((prev) => ({ ...prev, push: checked }))
-            }
+        </div>
+      </section>
+
+      <section className="enterprise-card overflow-hidden">
+        <div className="border-b border-[#D8DFE9] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#212121]">Notifications</h2>
+        </div>
+        <div className="divide-y divide-[#D8DFE9] p-5">
+          <ToggleRow
+            icon={Bell}
+            label="Workflow failure alerts"
+            checked={notifications.failures}
+            onToggle={(value) => setNotifications((prev) => ({ ...prev, failures: value }))}
+          />
+          <ToggleRow
+            icon={Bell}
+            label="Daily summary digest"
+            checked={notifications.summary}
+            onToggle={(value) => setNotifications((prev) => ({ ...prev, summary: value }))}
+          />
+          <ToggleRow
+            icon={Bell}
             label="Push notifications"
+            checked={notifications.push}
+            onToggle={(value) => setNotifications((prev) => ({ ...prev, push: value }))}
           />
-          <Toggle
-            checked={notifications.workflowFailures}
-            onChange={(checked) =>
-              setNotifications((prev) => ({ ...prev, workflowFailures: checked }))
-            }
-            label="Daily workflow summary emails"
-          />
-        </Card.Body>
-      </Card>
+        </div>
+      </section>
 
-      {/* Security */}
-      <Card>
-        <Card.Header>
-          <div className="flex items-center gap-3">
-            <Shield className="w-5 h-5 text-[var(--primary)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">Security</h2>
-          </div>
-        </Card.Header>
-        <Card.Body className="space-y-4">
-          <Button variant="secondary">Change Password</Button>
-          <div className="pt-2">
-            <Button variant="danger">Delete Account</Button>
-            <p className="text-sm text-[var(--text-muted)] mt-1">
-              Permanently delete your account and all associated data.
-            </p>
-          </div>
-        </Card.Body>
-      </Card>
+      <section className="enterprise-card overflow-hidden">
+        <div className="border-b border-[#D8DFE9] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#212121]">Security</h2>
+        </div>
+        <div className="space-y-3 p-5">
+          <SecurityAction title="Password" detail="Last changed 30 days ago" actionLabel="Change Password" />
+          <SecurityAction title="Two-Factor Authentication" detail="Recommended for all admins" actionLabel="Enable 2FA" primary />
+          <button type="button" className="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-[#EF4444] hover:bg-red-100">
+            Delete Account
+          </button>
+        </div>
+      </section>
     </div>
   );
 };
+
+const Field = ({ label, value }) => (
+  <label className="block">
+    <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.06em] text-[#5C5C5C]">{label}</span>
+    <input
+      value={value}
+      disabled
+      className="w-full rounded-xl border border-[#D8DFE9] bg-white px-3 py-2.5 text-sm text-[#212121]"
+    />
+  </label>
+);
+
+const ThemeCard = ({ icon: Icon, label, active, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={[
+      'rounded-2xl border p-4 text-left transition-colors',
+      active ? 'border-[#CFDECA] bg-[#CFDECA]/30' : 'border-[#D8DFE9] bg-white hover:border-[#CFDECA]',
+    ].join(' ')}
+  >
+    <div className="flex items-center gap-2">
+      <Icon size={16} className="text-[#212121]" />
+      <span className="text-sm font-semibold text-[#212121]">{label}</span>
+    </div>
+  </button>
+);
+
+const SecretField = ({ icon: Icon, label, value, onCopy, copied }) => (
+  <div>
+    <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.06em] text-[#5C5C5C]">{label}</span>
+    <div className="flex gap-2">
+      <div className="flex flex-1 items-center gap-2 rounded-xl border border-[#D8DFE9] bg-white px-3 py-2.5">
+        <Icon size={15} className="text-[#5C5C5C]" />
+        <input value={value} disabled className="w-full bg-transparent text-sm text-[#212121] outline-none" />
+      </div>
+      <button
+        type="button"
+        onClick={onCopy}
+        className="rounded-xl border border-[#D8DFE9] bg-white px-3 text-[#5C5C5C] hover:border-[#CFDECA]"
+        aria-label={`Copy ${label}`}
+      >
+        {copied ? <Check size={15} className="text-[#22C55E]" /> : <Copy size={15} />}
+      </button>
+    </div>
+  </div>
+);
+
+const ToggleRow = ({ icon: Icon, label, checked, onToggle }) => (
+  <div className="flex items-center justify-between py-3">
+    <div className="flex items-center gap-2">
+      <Icon size={15} className="text-[#5C5C5C]" />
+      <span className="text-sm font-medium text-[#212121]">{label}</span>
+    </div>
+    <button
+      type="button"
+      onClick={() => onToggle(!checked)}
+      className={`relative h-6 w-11 rounded-full ${checked ? 'bg-[#CFDECA]' : 'bg-[#D8DFE9]'}`}
+    >
+      <span
+        className={[
+          'absolute top-1 h-4 w-4 rounded-full bg-white transition-transform',
+          checked ? 'translate-x-6' : 'translate-x-1',
+        ].join(' ')}
+      />
+    </button>
+  </div>
+);
+
+const SecurityAction = ({ title, detail, actionLabel, primary = false }) => (
+  <div className="flex flex-col gap-2 rounded-xl border border-[#D8DFE9] bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex items-start gap-2">
+      <Shield size={15} className="mt-0.5 text-[#5C5C5C]" />
+      <div>
+        <p className="text-sm font-semibold text-[#212121]">{title}</p>
+        <p className="text-xs text-[#5C5C5C]">{detail}</p>
+      </div>
+    </div>
+    <button
+      type="button"
+      className={[
+        'rounded-xl px-3 py-2 text-sm font-semibold',
+        primary
+          ? 'bg-[#CFDECA] text-[#212121] hover:bg-[#BECFB8]'
+          : 'border border-[#D8DFE9] bg-white text-[#212121] hover:border-[#CFDECA]',
+      ].join(' ')}
+    >
+      {actionLabel}
+    </button>
+  </div>
+);
 
 export default Settings;

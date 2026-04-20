@@ -31,7 +31,7 @@ const Select = ({
           onChange={(e) => onChange?.(e.target.value)}
           disabled={disabled}
           className={`
-            w-full px-4 py-2.5 pr-10 rounded-lg border bg-[var(--background)] text-[var(--text-primary)]
+            w-full px-4 py-2.5 pr-10 rounded-2xl border bg-[#F6F5FA] text-[var(--text-primary)]
             appearance-none cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent
             disabled:opacity-50 disabled:cursor-not-allowed
             ${error ? 'border-[var(--error)]' : 'border-[var(--border)]'}

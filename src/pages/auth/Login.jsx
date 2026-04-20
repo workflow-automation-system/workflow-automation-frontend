@@ -1,169 +1,151 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, Workflow } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Building2, Lock, Mail, Moon, Sun, Workflow } from 'lucide-react';
 import useAuthStore from '../../stores/authStore';
 import useThemeStore from '../../stores/themeStore';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import Card from '../../components/ui/Card';
-import { Sun, Moon } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, isLoading, error, clearError, isAuthenticated } = useAuthStore();
+  const { clearError, error, isAuthenticated, isLoading, login } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
   const [formData, setFormData] = React.useState({ email: '', password: '' });
   const [formErrors, setFormErrors] = React.useState({});
 
-  // Redirect if already authenticated
   React.useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
-  // Clear errors on mount
   React.useEffect(() => {
     clearError();
   }, [clearError]);
 
-  const validateForm = () => {
+  const validate = () => {
     const errors = {};
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Invalid email format';
-    }
-    if (!formData.password) {
-      errors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
+    if (!formData.email) errors.email = 'Email is required';
+    if (!formData.password) errors.password = 'Password is required';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!validate()) return;
 
     const result = await login(formData.email, formData.password);
-    if (result.success) {
-      navigate('/');
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear field error when user starts typing
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
+    if (result.success) navigate('/');
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex flex-col">
-      {/* Theme toggle */}
-      <button
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors"
-      >
-        {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-      </button>
-
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-[var(--primary)] mb-4">
-              <Workflow size={32} className="text-white" />
+    <div className="min-h-screen bg-[#F6F5FA] font-urbanist lg:grid lg:grid-cols-2">
+      <section className="hidden bg-gradient-to-br from-[#CFDECA] to-[#EFF0A3] p-12 lg:flex lg:flex-col lg:justify-between">
+        <div>
+          <div className="mb-12 flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-soft">
+              <Workflow size={24} className="text-[#212121]" />
             </div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">Welcome Back</h1>
-            <p className="text-[var(--text-secondary)] mt-2">
-              Sign in to your FlowForge account
-            </p>
+            <span className="text-2xl font-bold text-[#212121]">FlowForge</span>
+          </div>
+          <h1 className="text-4xl font-bold leading-tight text-[#212121]">Enterprise Workflow Automation Platform</h1>
+          <p className="mt-4 max-w-md text-lg text-[#5C5C5C]">
+            Build secure, scalable automations across teams with visual orchestration and robust execution controls.
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-white/60 p-6 backdrop-blur-sm">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#CFDECA]">
+              <Building2 size={18} className="text-[#212121]" />
+            </div>
+            <div>
+              <p className="font-semibold text-[#212121]">Trusted by Enterprise Teams</p>
+              <p className="text-sm text-[#5C5C5C]">Secure automation for mission-critical operations.</p>
+            </div>
+          </div>
+          <div className="flex gap-2 text-xs font-semibold text-[#212121]">
+            <span className="rounded-full bg-white px-3 py-1">SOC 2</span>
+            <span className="rounded-full bg-white px-3 py-1">GDPR</span>
+            <span className="rounded-full bg-white px-3 py-1">99.9% Uptime</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative flex items-center justify-center p-6">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="absolute right-6 top-6 rounded-xl border border-[#D8DFE9] bg-white p-2 text-[#5C5C5C] hover:border-[#CFDECA]"
+        >
+          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
+
+        <div className="w-full max-w-md">
+          <div className="mb-8 text-center lg:hidden">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#CFDECA]">
+              <Workflow size={26} className="text-[#212121]" />
+            </div>
+            <h1 className="mt-3 text-2xl font-bold text-[#212121]">FlowForge</h1>
           </div>
 
-          {/* Login Form */}
-          <Card>
-            <Card.Body>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {error && (
-                  <div className="p-3 rounded-lg bg-[var(--error)] bg-opacity-10 border border-[var(--error)] text-[var(--error)] text-sm">
-                    {error}
-                  </div>
-                )}
+          <h2 className="text-2xl font-bold text-[#212121]">Welcome back</h2>
+          <p className="mt-1 text-sm text-[#5C5C5C]">Sign in to your enterprise workspace.</p>
 
-                <Input
-                  label="Email"
+          <form onSubmit={handleSubmit} className="enterprise-card mt-6 space-y-5 p-6">
+            {error && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#EF4444]">{error}</div>}
+
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium text-[#5C5C5C]">Email</span>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A8A8A]" />
+                <input
                   type="email"
-                  name="email"
                   value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  icon={Mail}
-                  error={formErrors.email}
-                  required
+                  onChange={(event) => setFormData((prev) => ({ ...prev, email: event.target.value }))}
+                  className="w-full rounded-xl border border-[#D8DFE9] bg-white py-2.5 pl-9 pr-3 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none"
+                  placeholder="you@company.com"
                 />
+              </div>
+              {formErrors.email && <span className="mt-1 block text-xs text-[#EF4444]">{formErrors.email}</span>}
+            </label>
 
-                <Input
-                  label="Password"
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium text-[#5C5C5C]">Password</span>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A8A8A]" />
+                <input
                   type="password"
-                  name="password"
                   value={formData.password}
-                  onChange={handleChange}
+                  onChange={(event) => setFormData((prev) => ({ ...prev, password: event.target.value }))}
+                  className="w-full rounded-xl border border-[#D8DFE9] bg-white py-2.5 pl-9 pr-3 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none"
                   placeholder="Enter your password"
-                  icon={Lock}
-                  error={formErrors.password}
-                  required
                 />
+              </div>
+              {formErrors.password && <span className="mt-1 block text-xs text-[#EF4444]">{formErrors.password}</span>}
+            </label>
 
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 rounded border-[var(--border)] text-[var(--primary)] focus:ring-[var(--primary)]"
-                    />
-                    <span className="text-sm text-[var(--text-secondary)]">Remember me</span>
-                  </label>
-                  <button
-                    type="button"
-                    className="text-sm text-[var(--primary)] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled
-                  >
-                    Forgot password?
-                  </button>
-                </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#212121] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#3A3A3A] disabled:opacity-60"
+            >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+              <ArrowRight size={14} />
+            </button>
+          </form>
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="w-full"
-                  loading={isLoading}
-                  disabled={isLoading}
-                >
-                  Sign In
-                </Button>
-              </form>
-            </Card.Body>
-          </Card>
-
-          {/* Demo credentials */}
-          <div className="mt-4 p-4 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
-            <p className="text-sm text-[var(--text-secondary)] mb-2">Demo credentials:</p>
-            <p className="text-sm text-[var(--text-primary)]">admin@example.com / admin123</p>
+          <div className="mt-4 rounded-xl border border-[#D8DFE9] bg-white p-4 text-sm text-[#5C5C5C]">
+            Demo credentials: <span className="font-semibold text-[#212121]">admin@example.com / admin123</span>
           </div>
 
-          {/* Sign up link */}
-          <p className="text-center mt-6 text-[var(--text-secondary)]">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-[var(--primary)] hover:underline font-medium">
+          <p className="mt-5 text-center text-sm text-[#5C5C5C]">
+            Do not have an account?{' '}
+            <Link to="/register" className="font-semibold text-[#212121] hover:underline">
               Sign up
             </Link>
           </p>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

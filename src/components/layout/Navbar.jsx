@@ -1,10 +1,29 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Bell, Sun, Moon, LogOut, User, ChevronRight } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  Bell,
+  ChevronRight,
+  LogOut,
+  Menu,
+  Moon,
+  Sun,
+  User,
+  Workflow,
+} from 'lucide-react';
 import useAuthStore from '../../stores/authStore';
 import useThemeStore from '../../stores/themeStore';
 
-const Navbar = () => {
+const routeToTitle = {
+  '/': 'Overview',
+  '/organisation': 'Organisation',
+  '/workflows': 'Workflows',
+  '/app-connections': 'App Connections',
+  '/templates': 'Templates',
+  '/settings': 'Settings',
+  '/create-workflow': 'Workflows',
+};
+
+const Navbar = ({ sidebarCollapsed, onOpenMobileSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
@@ -12,142 +31,164 @@ const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = React.useState(false);
   const [showNotifications, setShowNotifications] = React.useState(false);
 
-  // Generate breadcrumbs from path
-  const getBreadcrumbs = () => {
-    const paths = location.pathname.split('/').filter(Boolean);
-    const breadcrumbs = [{ label: 'Home', path: '/' }];
+  React.useEffect(() => {
+    setShowUserMenu(false);
+    setShowNotifications(false);
+  }, [location.pathname]);
 
-    paths.forEach((path, index) => {
-      const label = path
+  const getPageTitle = React.useCallback(() => {
+    if (location.pathname.startsWith('/workflow/')) {
+      return 'Workflows';
+    }
+
+    return routeToTitle[location.pathname] || 'Overview';
+  }, [location.pathname]);
+
+  const breadcrumbs = React.useMemo(() => {
+    const paths = location.pathname.split('/').filter(Boolean);
+    const items = [{ label: 'Overview', path: '/' }];
+
+    paths.forEach((segment, index) => {
+      const title = segment
         .split('-')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
-      breadcrumbs.push({
-        label,
+
+      items.push({
+        label: title,
         path: `/${paths.slice(0, index + 1).join('/')}`,
       });
     });
 
-    return breadcrumbs;
-  };
+    return items;
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const getPageTitle = () => {
-    const path = location.pathname;
-    if (path === '/') return 'Dashboard';
-    if (path === '/workflows') return 'Workflows';
-    if (path === '/create-workflow') return 'Create Workflow';
-    if (path.startsWith('/workflow/')) return 'Workflow Details';
-    if (path === '/settings') return 'Settings';
-    return '';
-  };
-
   return (
-    <header className="fixed top-0 right-0 h-16 bg-[var(--background)] border-b border-[var(--border)] flex items-center justify-between px-6 z-30"
-      style={{ left: 'var(--sidebar-width, 16rem)' }}
+    <header
+      className={[
+        'fixed top-0 left-0 z-30 flex h-16 w-full items-center justify-between border-b border-[#D8DFE9] bg-[#F6F5FA]/95 px-4 backdrop-blur-sm sm:px-6',
+        sidebarCollapsed ? 'lg:left-20 lg:w-[calc(100%-5rem)]' : 'lg:left-72 lg:w-[calc(100%-18rem)]',
+      ].join(' ')}
     >
-      {/* Breadcrumbs / Page Title */}
-      <div className="flex flex-col">
-        <h1 className="text-lg font-semibold text-[var(--text-primary)]">
-          {getPageTitle()}
-        </h1>
-        <nav className="flex items-center gap-1 text-sm">
-          {getBreadcrumbs().map((crumb, index) => (
-            <React.Fragment key={crumb.path}>
-              {index > 0 && <ChevronRight size={14} className="text-[var(--text-muted)]" />}
-              <button
-                onClick={() => navigate(crumb.path)}
-                className={`hover:text-[var(--primary)] transition-colors ${
-                  index === getBreadcrumbs().length - 1
-                    ? 'text-[var(--text-primary)] font-medium'
-                    : 'text-[var(--text-secondary)]'
-                }`}
-              >
-                {crumb.label}
-              </button>
-            </React.Fragment>
-          ))}
-        </nav>
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-3">
-        {/* Theme Toggle */}
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors"
-          title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-        >
-          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-        </button>
-
-        {/* Notifications */}
-        <div className="relative">
+      <div className="relative z-10 flex w-full items-center justify-between">
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors relative"
+            type="button"
+            onClick={onOpenMobileSidebar}
+            className="inline-flex rounded-xl border border-[#D8DFE9] bg-white p-2 text-[#5C5C5C] hover:bg-[#EFF0A3] lg:hidden"
+            aria-label="Open sidebar"
           >
-            <Bell size={20} />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--error)] rounded-full" />
+            <Menu size={18} />
           </button>
 
-          {showNotifications && (
-            <div className="absolute right-0 mt-2 w-72 bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-lg">
-              <div className="px-4 py-3 border-b border-[var(--border)]">
-                <h3 className="font-semibold text-[var(--text-primary)]">Notifications</h3>
-              </div>
-              <div className="px-4 py-6 text-center text-[var(--text-secondary)]">
-                No new notifications
-              </div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#D8DFE9] bg-[#CFDECA]">
+              <Workflow className="h-4 w-4 text-[#212121]" />
             </div>
-          )}
+            <div>
+              <h1 className="text-base font-semibold text-[#212121] sm:text-lg">{getPageTitle()}</h1>
+              <nav className="hidden items-center gap-1 text-xs text-[#8A8A8A] md:flex">
+                {breadcrumbs.map((crumb, index) => (
+                  <React.Fragment key={crumb.path}>
+                    {index > 0 && <ChevronRight className="h-3.5 w-3.5" />}
+                    <button
+                      type="button"
+                      onClick={() => navigate(crumb.path)}
+                      className={
+                        index === breadcrumbs.length - 1
+                          ? 'font-medium text-[#212121]'
+                          : 'hover:text-[#212121]'
+                      }
+                    >
+                      {crumb.label}
+                    </button>
+                  </React.Fragment>
+                ))}
+              </nav>
+            </div>
+          </div>
         </div>
 
-        {/* User Menu */}
-        <div className="relative">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[var(--surface-hover)] transition-colors"
+            type="button"
+            onClick={toggleTheme}
+            className="rounded-xl border border-[#D8DFE9] bg-white p-2 text-[#5C5C5C] hover:bg-[#EFF0A3]"
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
-            <div className="w-8 h-8 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-medium">
-              {user?.name?.charAt(0).toUpperCase() || 'U'}
-            </div>
-            <span className="text-sm font-medium text-[var(--text-primary)]">
-              {user?.name || 'User'}
-            </span>
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
 
-          {showUserMenu && (
-            <div className="absolute right-0 mt-2 w-48 bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-lg">
-              <div className="px-4 py-3 border-b border-[var(--border)]">
-                <p className="text-sm font-medium text-[var(--text-primary)]">{user?.name}</p>
-                <p className="text-xs text-[var(--text-secondary)]">{user?.email}</p>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowNotifications((prev) => !prev)}
+              className="relative rounded-xl border border-[#D8DFE9] bg-white p-2 text-[#5C5C5C] hover:bg-[#EFF0A3]"
+            >
+              <Bell size={18} />
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#22C55E]" />
+            </button>
+
+            {showNotifications && (
+              <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-[#D8DFE9] bg-[#F6F5FA] shadow-xl">
+                <div className="border-b border-[#D8DFE9] px-4 py-3">
+                  <h3 className="text-sm font-semibold text-[#212121]">Notifications</h3>
+                  <p className="text-xs text-[#5C5C5C]">All workflow systems are healthy.</p>
+                </div>
+                <div className="px-4 py-5 text-sm text-[#5C5C5C]">
+                  No unread notifications.
+                </div>
               </div>
-              <div className="p-1">
-                <button
-                  onClick={() => {
-                    setShowUserMenu(false);
-                    navigate('/settings');
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors"
-                >
-                  <User size={16} />
-                  Settings
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--error)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors"
-                >
-                  <LogOut size={16} />
-                  Logout
-                </button>
+            )}
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowUserMenu((prev) => !prev)}
+              className="flex items-center gap-2 rounded-xl border border-[#D8DFE9] bg-white px-2 py-1.5 hover:bg-[#EFF0A3]"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#D8DFE9] text-xs font-semibold text-[#212121]">
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
-            </div>
-          )}
+              <div className="hidden text-left sm:block">
+                <p className="text-xs font-semibold text-[#212121]">{user?.name || 'User'}</p>
+                <p className="text-[11px] text-[#5C5C5C]">{user?.email || 'user@company.com'}</p>
+              </div>
+            </button>
+
+            {showUserMenu && (
+              <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-[#D8DFE9] bg-[#F6F5FA] shadow-xl">
+                <div className="border-b border-[#D8DFE9] px-4 py-3">
+                  <p className="text-sm font-medium text-[#212121]">{user?.name || 'User'}</p>
+                  <p className="text-xs text-[#5C5C5C]">{user?.email || 'user@company.com'}</p>
+                </div>
+                <div className="p-2">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/settings')}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[#212121] hover:bg-white"
+                  >
+                    <User size={16} />
+                    Settings
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[#EF4444] hover:bg-red-50"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

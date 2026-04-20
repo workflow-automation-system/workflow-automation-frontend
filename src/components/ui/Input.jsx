@@ -42,7 +42,7 @@ const Input = ({
           disabled={disabled}
           placeholder={placeholder}
           className={`
-            w-full px-4 py-2.5 rounded-lg border bg-[var(--background)] text-[var(--text-primary)]
+            w-full px-4 py-2.5 rounded-2xl border bg-[#F6F5FA] text-[var(--text-primary)]
             transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent
             disabled:opacity-50 disabled:cursor-not-allowed
             ${Icon ? 'pl-10' : ''}

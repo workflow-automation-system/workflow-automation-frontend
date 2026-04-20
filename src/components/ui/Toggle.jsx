@@ -14,7 +14,7 @@ const Toggle = ({ checked, onChange, label, disabled = false, className = '' }) 
         <div
           className={`
             w-11 h-6 rounded-full transition-colors
-            ${checked ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}
+            ${checked ? 'bg-[#CFDECA]' : 'bg-[var(--border)]'}
           `}
         />
         <div

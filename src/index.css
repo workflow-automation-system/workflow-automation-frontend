@@ -1,168 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Theme CSS Variables */
 :root {
-  /* Light theme colors */
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --secondary: #64748b;
-  --secondary-hover: #475569;
+  --background: #f6f5fa;
+  --background-muted: #d8dfe9;
+  --surface: #ffffff;
+  --surface-hover: #f4f4f8;
+  --surface-elevated: #ffffff;
+
+  --primary: #212121;
+  --primary-hover: #3a3a3a;
+  --secondary: #cfdeca;
+  --secondary-hover: #becfb8;
+  --accent-highlight: #eff0a3;
+
+  --text-primary: #212121;
+  --text-secondary: #5c5c5c;
+  --text-muted: #8a8a8a;
+
+  --border: #d8dfe9;
+  --border-subtle: #e7ebf1;
+  --border-hover: #c4ccd8;
+
   --success: #22c55e;
   --success-hover: #16a34a;
   --warning: #f59e0b;
-  --warning-hover: #d97706;
   --error: #ef4444;
   --error-hover: #dc2626;
+  --info: #3b82f6;
 
-  --background: #ffffff;
-  --surface: #f8fafc;
-  --surface-hover: #f1f5f9;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --border: #e2e8f0;
-  --border-hover: #cbd5e1;
-
-  /* Sidebar specific */
-  --sidebar-bg: #f8fafc;
-  --sidebar-text: #64748b;
-  --sidebar-text-active: #3b82f6;
-  --sidebar-hover: #f1f5f9;
-
-  /* Node colors */
-  --node-trigger: #f59e0b;
-  --node-email: #3b82f6;
-  --node-webhook: #8b5cf6;
-  --node-delay: #22c55e;
-}
-
-[data-theme="dark"] {
-  --primary: #60a5fa;
-  --primary-hover: #3b82f6;
-  --secondary: #94a3b8;
-  --secondary-hover: #cbd5e1;
-  --success: #4ade80;
-  --success-hover: #22c55e;
-  --warning: #fbbf24;
-  --warning-hover: #f59e0b;
-  --error: #f87171;
-  --error-hover: #ef4444;
-
-  --background: #0f172a;
-  --surface: #1e293b;
-  --surface-hover: #334155;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --border: #334155;
-  --border-hover: #475569;
-
-  --sidebar-bg: #1e293b;
-  --sidebar-text: #94a3b8;
-  --sidebar-text-active: #60a5fa;
-  --sidebar-hover: #334155;
-}
-
-/* Base styles */
-body {
-  background-color: var(--background);
-  color: var(--text-primary);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
 }
 
 * {
   box-sizing: border-box;
 }
 
-/* Scrollbar styling */
+html {
+  font-family: 'Urbanist', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(207, 222, 202, 0.42), transparent 32%),
+    radial-gradient(circle at 0% 100%, rgba(216, 223, 233, 0.5), transparent 40%),
+    var(--background);
+  color: var(--text-primary);
+  font-family: 'Urbanist', sans-serif;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--surface);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
+  background: var(--border-hover);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: var(--text-muted);
 }
 
-/* React Flow customizations */
+.enterprise-card {
+  background-color: #f6f5fa;
+  border: 1px solid #d8dfe9;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(33, 33, 33, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.enterprise-card:hover {
+  border-color: #cfdeca;
+  box-shadow: 0 12px 30px rgba(33, 33, 33, 0.08);
+}
+
+.enterprise-flat {
+  background-color: #f6f5fa;
+  border: 1px solid #d8dfe9;
+  border-radius: 16px;
+}
+
+.bento-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.canvas-grid-bg {
+  background-image:
+    linear-gradient(rgba(216, 223, 233, 0.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(216, 223, 233, 0.6) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
 .react-flow__node {
-  border-radius: 8px;
-  border: 2px solid var(--border);
-  background: var(--surface);
-  color: var(--text-primary);
-  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid #d8dfe9;
+  background: #f6f5fa;
+  color: #212121;
+  padding: 14px 16px;
   font-size: 14px;
+  font-family: 'Urbanist', sans-serif;
+  box-shadow: 0 8px 24px rgba(33, 33, 33, 0.04);
 }
 
 .react-flow__node.selected {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px var(--primary);
+  border-color: #cfdeca;
+  box-shadow: 0 0 0 4px rgba(207, 222, 202, 0.45);
 }
 
 .react-flow__edge-path {
-  stroke: var(--text-secondary);
+  stroke: #5c5c5c;
   stroke-width: 2;
 }
 
 .react-flow__handle {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--primary);
-  border: 2px solid var(--background);
+  background: #cfdeca;
+  border: 2px solid #ffffff;
 }
 
-.react-flow__handle:hover {
-  background: var(--primary-hover);
-}
-
-.react-flow__controls {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-
-.react-flow__controls-button {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  color: var(--text-primary);
-}
-
-.react-flow__controls-button:hover {
-  background: var(--surface-hover);
-}
-
+.react-flow__controls,
 .react-flow__minimap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: #f6f5fa;
+  border: 1px solid #d8dfe9;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(33, 33, 33, 0.06);
 }
-
-/* Utility classes for theme colors */
-.bg-primary { background-color: var(--primary); }
-.bg-secondary { background-color: var(--secondary); }
-.bg-success { background-color: var(--success); }
-.bg-warning { background-color: var(--warning); }
-.bg-error { background-color: var(--error); }
-.bg-background { background-color: var(--background); }
-.bg-surface { background-color: var(--surface); }
-
-.text-primary { color: var(--primary); }
-.text-secondary { color: var(--text-secondary); }
-.text-success { color: var(--success); }
-.text-warning { color: var(--warning); }
-.text-error { color: var(--error); }
-
-.border-primary { border-color: var(--primary); }
-.border-secondary { border-color: var(--border); }
