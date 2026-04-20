@@ -53,8 +53,8 @@ const CreateWorkflow = () => {
           {
             ...connection,
             id: generateId('edge'),
-            markerEnd: { type: MarkerType.ArrowClosed, color: '#5C5C5C' },
-            style: { stroke: '#5C5C5C', strokeWidth: 2 },
+            markerEnd: { type: MarkerType.ArrowClosed, color: '#D0FFA4' },
+            style: { stroke: '#D0FFA4', strokeWidth: 2.2 },
           },
           currentEdges
         )
@@ -150,14 +150,14 @@ const CreateWorkflow = () => {
             <button
               type="button"
               onClick={() => navigate('/workflows')}
-              className="rounded-xl border border-[#D8DFE9] bg-white p-2 text-[#5C5C5C] hover:border-[#CFDECA]"
+              className="rounded-xl border border-[#E2E8F0] bg-white p-2 text-[#5C5C5C] hover:border-[#D0FFA4]"
               aria-label="Back to workflows"
             >
               <ArrowLeft size={16} />
             </button>
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#D8DFE9] bg-[#CFDECA]">
-              <Play size={16} className="text-[#212121]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E2E8F0] bg-[#D0FFA4]">
+              <Play size={16} className="text-[#292D32]" />
             </div>
 
             <div>
@@ -165,7 +165,7 @@ const CreateWorkflow = () => {
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Untitled Enterprise Workflow"
-                className="w-full bg-transparent text-lg font-semibold text-[#212121] outline-none placeholder:text-[#8A8A8A]"
+                className="w-full bg-transparent text-lg font-semibold text-[#292D32] outline-none placeholder:text-[#8A8A8A]"
               />
               <p className="text-xs text-[#5C5C5C]">
                 Design resilient multi-step logic with branch controls, retries, and governed mapping.
@@ -177,7 +177,7 @@ const CreateWorkflow = () => {
             <button
               type="button"
               onClick={() => navigate('/workflows')}
-              className="rounded-xl border border-[#D8DFE9] bg-white px-4 py-2 text-sm font-semibold text-[#5C5C5C] hover:border-[#CFDECA]"
+              className="rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm font-semibold text-[#5C5C5C] hover:border-[#D0FFA4]"
             >
               Cancel
             </button>
@@ -185,7 +185,7 @@ const CreateWorkflow = () => {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#212121] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3A3A3A] disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#292D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3C4249] disabled:opacity-60"
             >
               <Save size={14} />
               {saving ? 'Saving...' : 'Save Workflow'}
@@ -198,17 +198,17 @@ const CreateWorkflow = () => {
         <NodeSidebar />
 
         <section className="enterprise-card flex min-h-[520px] flex-col overflow-hidden">
-          <div className="flex items-center justify-between border-b border-[#D8DFE9] bg-[#F6F5FA] px-4 py-3">
+          <div className="flex items-center justify-between border-b border-[#E2E8F0] bg-[#F6F5FA] px-4 py-3">
             <div className="flex items-center gap-2">
-              <SplitSquareVertical size={16} className="text-[#212121]" />
-              <p className="text-sm font-semibold text-[#212121]">Workflow Canvas</p>
+              <SplitSquareVertical size={16} className="text-[#292D32]" />
+              <p className="text-sm font-semibold text-[#292D32]">Workflow Canvas</p>
             </div>
             <span className="text-xs text-[#5C5C5C]">
               {nodes.length} nodes, {edges.length} connections
             </span>
           </div>
 
-          <div className="canvas-grid-bg flex-1 bg-white">
+          <div className="canvas-grid-bg relative flex-1 bg-white">
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -226,14 +226,32 @@ const CreateWorkflow = () => {
               nodeTypes={nodeTypesMap}
               fitView
               defaultEdgeOptions={{
-                style: { stroke: '#5C5C5C', strokeWidth: 2 },
-                markerEnd: { type: MarkerType.ArrowClosed, color: '#5C5C5C' },
+                style: { stroke: '#D0FFA4', strokeWidth: 2.2 },
+                markerEnd: { type: MarkerType.ArrowClosed, color: '#D0FFA4' },
               }}
             >
-              <Background gap={24} color="#D8DFE9" />
+              <Background gap={24} color="#E2E8F0" />
               <Controls />
-              <MiniMap nodeColor="#CFDECA" maskColor="rgba(246, 245, 250, 0.7)" />
+                <MiniMap nodeColor="#D0FFA4" maskColor="rgba(246, 245, 250, 0.7)" />
             </ReactFlow>
+
+            <button
+              type="button"
+              className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#292D32] shadow-sm transition-colors hover:border-[#D0FFA4]"
+            >
+              AI + Help
+            </button>
+
+            <div className="absolute bottom-4 right-4 space-y-2">
+              <div className="rounded-xl border border-[#E2E8F0] bg-white px-3 py-2 text-xs shadow-sm">
+                <p className="font-semibold text-[#292D32]">Scenario 1</p>
+                <p className="text-[#5E6672]">Data mapping healthy</p>
+              </div>
+              <div className="rounded-xl border border-[#E2E8F0] bg-white px-3 py-2 text-xs shadow-sm">
+                <p className="font-semibold text-[#292D32]">Scenario 2</p>
+                <p className="text-[#5E6672]">Fallback branch standby</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -246,7 +264,7 @@ const CreateWorkflow = () => {
           />
         ) : (
           <aside className="enterprise-card hidden p-4 text-sm text-[#5C5C5C] xl:block">
-            <p className="text-sm font-semibold text-[#212121]">Node Configuration</p>
+            <p className="text-sm font-semibold text-[#292D32]">Node Configuration</p>
             <p className="mt-2">
               Select a node to configure branching rules, data transformations, connector credentials, and error policy.
             </p>
@@ -256,16 +274,16 @@ const CreateWorkflow = () => {
 
       <footer className="enterprise-card flex flex-col gap-3 p-4 md:flex-row md:items-center">
         <div className="flex items-center gap-2 text-sm text-[#5C5C5C]">
-          <FileText size={15} className="text-[#212121]" />
+          <FileText size={15} className="text-[#292D32]" />
           Workflow Description
         </div>
         <input
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           placeholder="Describe business intent, owner, and fallback behavior..."
-          className="flex-1 rounded-xl border border-[#D8DFE9] bg-white px-3 py-2.5 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none"
+          className="flex-1 rounded-xl border border-[#E2E8F0] bg-white px-3 py-2.5 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none"
         />
-        <div className="inline-flex items-center gap-1 rounded-full bg-[#CFDECA] px-3 py-1 text-xs font-semibold text-[#212121]">
+        <div className="inline-flex items-center gap-1 rounded-full bg-[#D0FFA4] px-3 py-1 text-xs font-semibold text-[#292D32]">
           <ShieldCheck size={12} />
           Enterprise-ready
         </div>

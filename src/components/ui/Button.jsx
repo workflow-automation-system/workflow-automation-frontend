@@ -15,10 +15,10 @@ const Button = ({
 
   const variants = {
     primary: 'bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] focus:ring-[var(--primary)]',
-    secondary: 'bg-[#F6F5FA] text-[var(--text-primary)] border border-[#D8DFE9] hover:border-[#CFDECA] focus:ring-[var(--secondary)]',
+    secondary: 'bg-white text-[var(--text-primary)] border border-[#E2E8F0] hover:border-[#D0FFA4] focus:ring-[var(--secondary)]',
     ghost: 'bg-transparent text-[var(--text-primary)] hover:bg-[var(--surface-hover)] focus:ring-[var(--secondary)]',
     danger: 'bg-[var(--error)] text-white hover:bg-[var(--error-hover)] focus:ring-[var(--error)]',
-    success: 'bg-[#CFDECA] text-[#212121] hover:bg-[#BECFB8] focus:ring-[#CFDECA]',
+    success: 'bg-[#D0FFA4] text-[#292D32] hover:bg-[#BDEB94] focus:ring-[#D0FFA4]',
   };
 
   const sizes = {

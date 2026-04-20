@@ -5,32 +5,33 @@
 @tailwind utilities;
 
 :root {
-  --background: #f6f5fa;
-  --background-muted: #d8dfe9;
-  --surface: #ffffff;
+  --background: #F6F5FA;
+  --background-muted: #F6F5FA;
+  --background-subtle: #F6F5FA;
+  --surface: #FFFFFF;
   --surface-hover: #f4f4f8;
   --surface-elevated: #ffffff;
 
-  --primary: #212121;
-  --primary-hover: #3a3a3a;
-  --secondary: #cfdeca;
-  --secondary-hover: #becfb8;
-  --accent-highlight: #eff0a3;
+  --primary: #292D32;
+  --primary-hover: #3C4249;
+  --secondary: #D0FFA4;
+  --secondary-hover: #bbef89;
+  --accent-highlight: #D0FFA4;
 
-  --text-primary: #212121;
-  --text-secondary: #5c5c5c;
-  --text-muted: #8a8a8a;
+  --text-primary: #292D32;
+  --text-secondary: #5E6672;
+  --text-muted: #8D95A1;
 
-  --border: #d8dfe9;
-  --border-subtle: #e7ebf1;
-  --border-hover: #c4ccd8;
+  --border: #E2E8F0;
+  --border-subtle: #E7EBF1;
+  --border-hover: #C4CCD8;
 
-  --success: #22c55e;
-  --success-hover: #16a34a;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --error-hover: #dc2626;
-  --info: #3b82f6;
+  --success: #D0FFA4;
+  --success-hover: #bbef89;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --error-hover: #DC2626;
+  --info: #3B82F6;
 
   --radius-md: 16px;
   --radius-lg: 20px;
@@ -45,14 +46,12 @@ html {
   font-family: 'Urbanist', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 15px;
 }
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at 100% 0%, rgba(207, 222, 202, 0.42), transparent 32%),
-    radial-gradient(circle at 0% 100%, rgba(216, 223, 233, 0.5), transparent 40%),
-    var(--background);
+  background: var(--background);
   color: var(--text-primary);
   font-family: 'Urbanist', sans-serif;
 }
@@ -76,21 +75,21 @@ body {
 }
 
 .enterprise-card {
-  background-color: #f6f5fa;
-  border: 1px solid #d8dfe9;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(33, 33, 33, 0.04);
+  box-shadow: 0 8px 24px rgba(41, 45, 50, 0.04);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .enterprise-card:hover {
-  border-color: #cfdeca;
-  box-shadow: 0 12px 30px rgba(33, 33, 33, 0.08);
+  border-color: var(--secondary);
+  box-shadow: 0 12px 30px rgba(41, 45, 50, 0.08);
 }
 
 .enterprise-flat {
-  background-color: #f6f5fa;
-  border: 1px solid #d8dfe9;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
 }
 
@@ -101,29 +100,29 @@ body {
 
 .canvas-grid-bg {
   background-image:
-    linear-gradient(rgba(216, 223, 233, 0.6) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(216, 223, 233, 0.6) 1px, transparent 1px);
+    linear-gradient(rgba(226, 232, 240, 0.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 .react-flow__node {
   border-radius: var(--radius-md);
-  border: 1px solid #d8dfe9;
-  background: #f6f5fa;
-  color: #212121;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
   padding: 14px 16px;
   font-size: 14px;
   font-family: 'Urbanist', sans-serif;
-  box-shadow: 0 8px 24px rgba(33, 33, 33, 0.04);
+  box-shadow: 0 8px 24px rgba(41, 45, 50, 0.04);
 }
 
 .react-flow__node.selected {
-  border-color: #cfdeca;
-  box-shadow: 0 0 0 4px rgba(207, 222, 202, 0.45);
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 4px rgba(208, 255, 164, 0.45);
 }
 
 .react-flow__edge-path {
-  stroke: #5c5c5c;
+  stroke: var(--primary);
   stroke-width: 2;
 }
 
@@ -131,14 +130,14 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #cfdeca;
-  border: 2px solid #ffffff;
+  background: var(--secondary);
+  border: 2px solid var(--surface);
 }
 
 .react-flow__controls,
 .react-flow__minimap {
-  background: #f6f5fa;
-  border: 1px solid #d8dfe9;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(33, 33, 33, 0.06);
+  box-shadow: 0 8px 24px rgba(41, 45, 50, 0.06);
 }

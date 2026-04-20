@@ -63,7 +63,7 @@ const Templates = () => {
     <div className="space-y-5 font-urbanist">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#212121]">Templates</h1>
+          <h1 className="text-3xl font-bold text-[#292D32]">Templates</h1>
           <p className="mt-1 text-sm text-[#5C5C5C]">
             Deploy pre-built enterprise blueprints for scalable automation programs.
           </p>
@@ -71,7 +71,7 @@ const Templates = () => {
         <button
           type="button"
           onClick={() => navigate('/create-workflow')}
-          className="inline-flex items-center gap-2 rounded-2xl bg-[#212121] px-5 py-3 text-sm font-semibold text-white hover:bg-[#3A3A3A]"
+          className="inline-flex items-center gap-2 rounded-2xl bg-[#292D32] px-5 py-3 text-sm font-semibold text-white hover:bg-[#3C4249]"
         >
           <Plus size={16} />
           Create Custom
@@ -81,22 +81,22 @@ const Templates = () => {
       <section className="enterprise-card p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-[#212121]">Enterprise Template Library</h2>
+            <h2 className="text-xl font-semibold text-[#292D32]">Enterprise Template Library</h2>
             <p className="mt-1 text-sm text-[#5C5C5C]">
               Curated blueprints for branching logic, error handling, and governed data mapping patterns.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <div className="rounded-xl border border-[#D8DFE9] bg-white px-4 py-3 text-center">
-              <p className="text-xl font-bold text-[#212121]">48+</p>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-center">
+              <p className="text-xl font-bold text-[#292D32]">48+</p>
               <p className="text-xs text-[#5C5C5C]">Templates</p>
             </div>
-            <div className="rounded-xl border border-[#D8DFE9] bg-white px-4 py-3 text-center">
-              <p className="text-xl font-bold text-[#212121]">15k+</p>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-center">
+              <p className="text-xl font-bold text-[#292D32]">15k+</p>
               <p className="text-xs text-[#5C5C5C]">Deployments</p>
             </div>
-            <div className="rounded-xl border border-[#D8DFE9] bg-white px-4 py-3 text-center">
-              <p className="text-xl font-bold text-[#212121]">99%</p>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-center">
+              <p className="text-xl font-bold text-[#292D32]">99%</p>
               <p className="text-xs text-[#5C5C5C]">Reliability</p>
             </div>
           </div>
@@ -109,7 +109,7 @@ const Templates = () => {
           <input
             type="text"
             placeholder="Search templates"
-            className="w-full rounded-2xl border border-[#D8DFE9] bg-white py-3 pl-10 pr-4 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none"
+            className="w-full rounded-2xl border border-[#E2E8F0] bg-white py-3 pl-10 pr-4 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none"
           />
         </div>
       </div>
@@ -123,8 +123,8 @@ const Templates = () => {
             className={[
               'rounded-xl border px-4 py-2 text-sm font-medium transition-colors',
               selectedCategory === category.name
-                ? 'border-[#212121] bg-[#212121] text-white'
-                : 'border-[#D8DFE9] bg-white text-[#5C5C5C] hover:border-[#CFDECA]',
+                ? 'border-[#292D32] bg-[#292D32] text-white'
+                : 'border-[#E2E8F0] bg-white text-[#5C5C5C] hover:border-[#D0FFA4]',
             ].join(' ')}
           >
             {category.name}
@@ -137,25 +137,25 @@ const Templates = () => {
         {visibleTemplates.map((template) => (
           <article key={template.id} className="enterprise-card p-5">
             <div className="flex items-start justify-between">
-              <div className="rounded-xl border border-[#D8DFE9] bg-[#EFF0A3] p-2.5">
-                <Sparkles size={17} className="text-[#212121]" />
+              <div className="rounded-xl border border-[#E2E8F0] bg-[#D0FFA4] p-2.5">
+                <Sparkles size={17} className="text-[#292D32]" />
               </div>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#CFDECA] px-2 py-1 text-xs font-semibold text-[#212121]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#D0FFA4] px-2 py-1 text-xs font-semibold text-[#292D32]">
                 <Star size={12} />
                 {template.rating}
               </span>
             </div>
 
-            <h3 className="mt-4 text-lg font-semibold text-[#212121]">{template.name}</h3>
+            <h3 className="mt-4 text-lg font-semibold text-[#292D32]">{template.name}</h3>
             <p className="mt-2 text-sm text-[#5C5C5C]">{template.description}</p>
 
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-[#5C5C5C]">
-              <span className="rounded-full border border-[#D8DFE9] bg-white px-3 py-1">{template.category}</span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-[#D8DFE9] bg-white px-3 py-1">
+              <span className="rounded-full border border-[#E2E8F0] bg-white px-3 py-1">{template.category}</span>
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#E2E8F0] bg-white px-3 py-1">
                 <GitBranch size={12} />
                 {template.nodes} nodes
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-[#D8DFE9] bg-white px-3 py-1">
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#E2E8F0] bg-white px-3 py-1">
                 <Users size={12} />
                 {template.runs} runs
               </span>
@@ -165,14 +165,14 @@ const Templates = () => {
               <button
                 type="button"
                 onClick={() => navigate('/create-workflow')}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#212121] px-3 py-2.5 text-sm font-semibold text-white hover:bg-[#3A3A3A]"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#292D32] px-3 py-2.5 text-sm font-semibold text-white hover:bg-[#3C4249]"
               >
                 Use Template
                 <ArrowRight size={14} />
               </button>
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-xl border border-[#D8DFE9] bg-white px-3 py-2.5 text-sm font-semibold text-[#212121] hover:border-[#CFDECA]"
+                className="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] bg-white px-3 py-2.5 text-sm font-semibold text-[#292D32] hover:border-[#D0FFA4]"
               >
                 <ShieldCheck size={14} />
               </button>

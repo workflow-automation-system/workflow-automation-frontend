@@ -30,16 +30,16 @@ const iconMap = {
 };
 
 const nodeBg = {
-  trigger: '#EFF0A3',
-  condition: '#D8DFE9',
-  data_mapper: '#D8DFE9',
-  error_handler: '#EFF0A3',
-  notion: '#CFDECA',
-  google_sheets: '#CFDECA',
-  chatgpt: '#CFDECA',
-  slack: '#CFDECA',
-  email: '#CFDECA',
-  webhook: '#D8DFE9',
+  trigger: '#D0FFA4',
+  condition: '#E2E8F0',
+  data_mapper: '#E2E8F0',
+  error_handler: '#D0FFA4',
+  notion: '#D0FFA4',
+  google_sheets: '#D0FFA4',
+  chatgpt: '#D0FFA4',
+  slack: '#D0FFA4',
+  email: '#D0FFA4',
+  webhook: '#E2E8F0',
   delay: '#F6F5FA',
 };
 
@@ -79,27 +79,27 @@ const CustomNode = ({ data, selected, type }) => {
   return (
     <div
       className={[
-        'min-w-[230px] rounded-2xl border bg-[#F6F5FA] px-4 py-3 shadow-card transition-all',
-        selected ? 'border-[#CFDECA] ring-2 ring-[#CFDECA]/40' : 'border-[#D8DFE9]',
+        'min-w-[230px] rounded-2xl border bg-white px-4 py-3 shadow-card transition-all',
+        selected ? 'border-[#D0FFA4] ring-2 ring-[#D0FFA4]/40' : 'border-[#E2E8F0]',
       ].join(' ')}
     >
       {type !== 'trigger' && (
         <Handle
           type="target"
           position={Position.Left}
-          className="!h-3 !w-3 !border-2 !border-white !bg-[#CFDECA]"
+          className="!h-3 !w-3 !border-2 !border-white !bg-[#D0FFA4]"
         />
       )}
 
       <div className="flex items-center gap-3">
         <div
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#D8DFE9]"
-          style={{ backgroundColor: nodeBg[type] || '#CFDECA' }}
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#E2E8F0]"
+          style={{ backgroundColor: nodeBg[type] || '#D0FFA4' }}
         >
-          <Icon size={16} className="text-[#212121]" />
+          <Icon size={16} className="text-[#292D32]" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-[#212121]">
+          <p className="truncate text-sm font-semibold text-[#292D32]">
             {data?.label || nodeConfig?.label || 'Node'}
           </p>
           <p className="truncate text-xs text-[#5C5C5C]">{getSubtitle(type, data)}</p>
@@ -109,7 +109,7 @@ const CustomNode = ({ data, selected, type }) => {
       <Handle
         type="source"
         position={Position.Right}
-        className="!h-3 !w-3 !border-2 !border-white !bg-[#CFDECA]"
+        className="!h-3 !w-3 !border-2 !border-white !bg-[#D0FFA4]"
       />
     </div>
   );

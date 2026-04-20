@@ -120,7 +120,7 @@ export const nodeTypes = [
     label: 'Trigger',
     description: 'Start the workflow when an enterprise event occurs',
     icon: 'Zap',
-    color: '#EFF0A3',
+    color: '#D0FFA4',
     defaultData: {
       label: 'New Trigger',
       eventType: 'manual',
@@ -132,7 +132,7 @@ export const nodeTypes = [
     label: 'Condition Branch',
     description: 'Route records down different branches with logical conditions',
     icon: 'GitBranch',
-    color: '#D8DFE9',
+    color: '#E2E8F0',
     defaultData: {
       label: 'Branch Condition',
       expression: 'order.total > 1000',
@@ -145,7 +145,7 @@ export const nodeTypes = [
     label: 'Data Mapper',
     description: 'Normalize source payloads to destination schemas',
     icon: 'Table2',
-    color: '#D8DFE9',
+    color: '#E2E8F0',
     defaultData: {
       label: 'Map Fields',
       source: 'payload.customer',
@@ -158,7 +158,7 @@ export const nodeTypes = [
     label: 'Error Handler',
     description: 'Capture failures and execute retry or fallback policy',
     icon: 'ShieldAlert',
-    color: '#EFF0A3',
+    color: '#D0FFA4',
     defaultData: {
       label: 'Handle Errors',
       policy: 'retry',
@@ -170,7 +170,7 @@ export const nodeTypes = [
     label: 'Notion',
     description: 'Read and write pages or databases in Notion',
     icon: 'BookCopy',
-    color: '#CFDECA',
+    color: '#D0FFA4',
     defaultData: {
       label: 'Update Notion',
       action: 'create_page',
@@ -182,7 +182,7 @@ export const nodeTypes = [
     label: 'Google Sheets',
     description: 'Append rows and manage tabular data workflows',
     icon: 'Sheet',
-    color: '#CFDECA',
+    color: '#D0FFA4',
     defaultData: {
       label: 'Append Row',
       spreadsheetId: '',
@@ -194,7 +194,7 @@ export const nodeTypes = [
     label: 'ChatGPT',
     description: 'Generate or classify content with secure prompts',
     icon: 'Bot',
-    color: '#CFDECA',
+    color: '#D0FFA4',
     defaultData: {
       label: 'Generate Summary',
       model: 'gpt-5.4-mini',
@@ -206,7 +206,7 @@ export const nodeTypes = [
     label: 'Slack',
     description: 'Send channel messages and incident updates',
     icon: 'MessageSquare',
-    color: '#CFDECA',
+    color: '#D0FFA4',
     defaultData: {
       label: 'Notify Channel',
       channel: '#ops-alerts',
@@ -218,7 +218,7 @@ export const nodeTypes = [
     label: 'Email',
     description: 'Send an email notification',
     icon: 'Mail',
-    color: '#CFDECA',
+    color: '#D0FFA4',
     defaultData: {
       label: 'Send Email',
       to: '',
@@ -231,7 +231,7 @@ export const nodeTypes = [
     label: 'Webhook',
     description: 'Call an external API or internal endpoint',
     icon: 'Globe',
-    color: '#D8DFE9',
+    color: '#E2E8F0',
     defaultData: {
       label: 'HTTP Request',
       url: '',

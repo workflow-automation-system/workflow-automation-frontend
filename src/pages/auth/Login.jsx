@@ -39,31 +39,31 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-[#F6F5FA] font-urbanist lg:grid lg:grid-cols-2">
-      <section className="hidden bg-gradient-to-br from-[#CFDECA] to-[#EFF0A3] p-12 lg:flex lg:flex-col lg:justify-between">
+      <section className="hidden bg-gradient-to-br from-[#D0FFA4] to-[#D0FFA4] p-12 lg:flex lg:flex-col lg:justify-between">
         <div>
           <div className="mb-12 flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-soft">
-              <Workflow size={24} className="text-[#212121]" />
+              <Workflow size={24} className="text-[#292D32]" />
             </div>
-            <span className="text-2xl font-bold text-[#212121]">FlowForge</span>
+            <span className="text-2xl font-bold text-[#292D32]">FlowForge</span>
           </div>
-          <h1 className="text-4xl font-bold leading-tight text-[#212121]">Enterprise Workflow Automation Platform</h1>
+          <h1 className="text-4xl font-bold leading-tight text-[#292D32]">Business Automation for Enterprise</h1>
           <p className="mt-4 max-w-md text-lg text-[#5C5C5C]">
-            Build secure, scalable automations across teams with visual orchestration and robust execution controls.
+            Build secure, scalable automations across teams with enterprise orchestration and robust execution controls.
           </p>
         </div>
 
         <div className="rounded-2xl bg-white/60 p-6 backdrop-blur-sm">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#CFDECA]">
-              <Building2 size={18} className="text-[#212121]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D0FFA4]">
+              <Building2 size={18} className="text-[#292D32]" />
             </div>
             <div>
-              <p className="font-semibold text-[#212121]">Trusted by Enterprise Teams</p>
+              <p className="font-semibold text-[#292D32]">Trusted by Enterprise Teams</p>
               <p className="text-sm text-[#5C5C5C]">Secure automation for mission-critical operations.</p>
             </div>
           </div>
-          <div className="flex gap-2 text-xs font-semibold text-[#212121]">
+          <div className="flex gap-2 text-xs font-semibold text-[#292D32]">
             <span className="rounded-full bg-white px-3 py-1">SOC 2</span>
             <span className="rounded-full bg-white px-3 py-1">GDPR</span>
             <span className="rounded-full bg-white px-3 py-1">99.9% Uptime</span>
@@ -75,20 +75,20 @@ const Login = () => {
         <button
           type="button"
           onClick={toggleTheme}
-          className="absolute right-6 top-6 rounded-xl border border-[#D8DFE9] bg-white p-2 text-[#5C5C5C] hover:border-[#CFDECA]"
+          className="absolute right-6 top-6 rounded-xl border border-[#E2E8F0] bg-white p-2 text-[#5C5C5C] hover:border-[#D0FFA4]"
         >
           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
         </button>
 
         <div className="w-full max-w-md">
           <div className="mb-8 text-center lg:hidden">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#CFDECA]">
-              <Workflow size={26} className="text-[#212121]" />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D0FFA4]">
+              <Workflow size={26} className="text-[#292D32]" />
             </div>
-            <h1 className="mt-3 text-2xl font-bold text-[#212121]">FlowForge</h1>
+            <h1 className="mt-3 text-2xl font-bold text-[#292D32]">FlowForge</h1>
           </div>
 
-          <h2 className="text-2xl font-bold text-[#212121]">Welcome back</h2>
+          <h2 className="text-2xl font-bold text-[#292D32]">Welcome back</h2>
           <p className="mt-1 text-sm text-[#5C5C5C]">Sign in to your enterprise workspace.</p>
 
           <form onSubmit={handleSubmit} className="enterprise-card mt-6 space-y-5 p-6">
@@ -102,7 +102,7 @@ const Login = () => {
                   type="email"
                   value={formData.email}
                   onChange={(event) => setFormData((prev) => ({ ...prev, email: event.target.value }))}
-                  className="w-full rounded-xl border border-[#D8DFE9] bg-white py-2.5 pl-9 pr-3 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none"
+                  className="w-full rounded-xl border border-[#E2E8F0] bg-white py-2.5 pl-9 pr-3 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none"
                   placeholder="you@company.com"
                 />
               </div>
@@ -117,7 +117,7 @@ const Login = () => {
                   type="password"
                   value={formData.password}
                   onChange={(event) => setFormData((prev) => ({ ...prev, password: event.target.value }))}
-                  className="w-full rounded-xl border border-[#D8DFE9] bg-white py-2.5 pl-9 pr-3 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none"
+                  className="w-full rounded-xl border border-[#E2E8F0] bg-white py-2.5 pl-9 pr-3 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none"
                   placeholder="Enter your password"
                 />
               </div>
@@ -127,20 +127,20 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#212121] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#3A3A3A] disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#292D32] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#3C4249] disabled:opacity-60"
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
               <ArrowRight size={14} />
             </button>
           </form>
 
-          <div className="mt-4 rounded-xl border border-[#D8DFE9] bg-white p-4 text-sm text-[#5C5C5C]">
-            Demo credentials: <span className="font-semibold text-[#212121]">admin@example.com / admin123</span>
+          <div className="mt-4 rounded-xl border border-[#E2E8F0] bg-white p-4 text-sm text-[#5C5C5C]">
+            Demo credentials: <span className="font-semibold text-[#292D32]">admin@example.com / admin123</span>
           </div>
 
           <p className="mt-5 text-center text-sm text-[#5C5C5C]">
             Do not have an account?{' '}
-            <Link to="/register" className="font-semibold text-[#212121] hover:underline">
+            <Link to="/register" className="font-semibold text-[#292D32] hover:underline">
               Sign up
             </Link>
           </p>

@@ -3,21 +3,21 @@ import { Settings2, Trash2, X } from 'lucide-react';
 import { nodeTypes } from '../../mock/data';
 
 const nodeColor = {
-  trigger: '#EFF0A3',
-  condition: '#D8DFE9',
-  data_mapper: '#D8DFE9',
-  error_handler: '#EFF0A3',
-  notion: '#CFDECA',
-  google_sheets: '#CFDECA',
-  chatgpt: '#CFDECA',
-  slack: '#CFDECA',
-  email: '#CFDECA',
-  webhook: '#D8DFE9',
+  trigger: '#D0FFA4',
+  condition: '#E2E8F0',
+  data_mapper: '#E2E8F0',
+  error_handler: '#D0FFA4',
+  notion: '#D0FFA4',
+  google_sheets: '#D0FFA4',
+  chatgpt: '#D0FFA4',
+  slack: '#D0FFA4',
+  email: '#D0FFA4',
+  webhook: '#E2E8F0',
   delay: '#F6F5FA',
 };
 
 const inputStyle =
-  'w-full rounded-xl border border-[#D8DFE9] bg-white px-3 py-2.5 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none';
+  'w-full rounded-xl border border-[#E2E8F0] bg-white px-3 py-2.5 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none';
 
 const ConfigPanel = ({ node, onClose, onUpdate, onDelete }) => {
   const nodeConfig = nodeTypes.find((item) => item.type === node.type);
@@ -307,16 +307,16 @@ const ConfigPanel = ({ node, onClose, onUpdate, onDelete }) => {
 
   return (
     <aside className="enterprise-card h-full w-full min-w-[300px] max-w-[320px] overflow-hidden">
-      <div className="flex items-center justify-between border-b border-[#D8DFE9] p-4">
+      <div className="flex items-center justify-between border-b border-[#E2E8F0] p-4">
         <div className="flex items-center gap-3">
           <span
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#D8DFE9]"
-            style={{ backgroundColor: nodeColor[node.type] || '#CFDECA' }}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#E2E8F0]"
+            style={{ backgroundColor: nodeColor[node.type] || '#D0FFA4' }}
           >
-            <Settings2 size={16} className="text-[#212121]" />
+            <Settings2 size={16} className="text-[#292D32]" />
           </span>
           <div>
-            <p className="text-sm font-semibold text-[#212121]">{nodeConfig?.label || 'Node'} Settings</p>
+            <p className="text-sm font-semibold text-[#292D32]">{nodeConfig?.label || 'Node'} Settings</p>
             <p className="text-xs text-[#5C5C5C]">Configure data, mapping, and behavior.</p>
           </div>
         </div>
@@ -343,7 +343,7 @@ const ConfigPanel = ({ node, onClose, onUpdate, onDelete }) => {
         {renderFields()}
       </div>
 
-      <div className="border-t border-[#D8DFE9] p-4">
+      <div className="border-t border-[#E2E8F0] p-4">
         <button
           type="button"
           onClick={onDelete}

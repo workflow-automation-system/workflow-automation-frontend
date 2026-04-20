@@ -2,15 +2,15 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Building2,
-  ChevronLeft,
-  ChevronRight,
   LayoutGrid,
   Layers,
+  LogOut,
   Plug,
   Settings,
+  UserCircle2,
   Workflow,
-  X,
 } from 'lucide-react';
+import useAuthStore from '../../stores/authStore';
 
 const navItems = [
   { path: '/', icon: LayoutGrid, label: 'Overview' },
@@ -21,96 +21,55 @@ const navItems = [
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];
 
-const Sidebar = ({ isCollapsed, onToggle, mobileOpen, onCloseMobile }) => {
+const Sidebar = () => {
+  const { logout, user } = useAuthStore();
+
   return (
-    <>
-      {mobileOpen && (
-        <button
-          type="button"
-          aria-label="Close navigation overlay"
-          onClick={onCloseMobile}
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] lg:hidden"
-        />
-      )}
-
-      <aside
-        className={[
-          'fixed left-0 top-0 z-50 h-screen border-r border-[#D8DFE9] bg-[#F6F5FA] transition-all duration-300',
-          isCollapsed ? 'w-20' : 'w-72',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full',
-          'lg:translate-x-0',
-        ].join(' ')}
-      >
-        <div className="flex h-16 items-center justify-between border-b border-[#D8DFE9] px-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D8DFE9] bg-[#CFDECA]">
-              <Workflow size={20} className="text-[#212121]" />
-            </div>
-            {!isCollapsed && (
-              <div>
-                <p className="text-sm font-semibold leading-tight text-[#212121]">FlowForge</p>
-                <p className="text-xs text-[#5C5C5C]">Enterprise Automation</p>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onToggle}
-              className="hidden rounded-xl border border-[#D8DFE9] bg-white p-1.5 text-[#5C5C5C] hover:bg-[#EFF0A3] lg:inline-flex"
-              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            >
-              {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            </button>
-
-            <button
-              type="button"
-              onClick={onCloseMobile}
-              className="inline-flex rounded-xl border border-[#D8DFE9] bg-white p-1.5 text-[#5C5C5C] hover:bg-[#EFF0A3] lg:hidden"
-              aria-label="Close sidebar"
-            >
-              <X size={16} />
-            </button>
-          </div>
+    <aside className="fixed left-0 top-0 z-50 h-screen w-20 border-r border-[#E2E8F0]  p-3">
+      <div className="flex h-full flex-col items-center">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white">
+          <Workflow size={20} className="text-[#292D32]" />
         </div>
 
-        <nav className="space-y-2 p-3">
+        <nav className="flex flex-1 flex-col items-center justify-center gap-2">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
-              title={isCollapsed ? item.label : undefined}
+              title={item.label}
               className={({ isActive }) =>
                 [
-                  'group flex items-center gap-3 rounded-2xl border px-3 py-3 transition-colors',
-                  isCollapsed ? 'justify-center' : '',
+                  'flex h-11 w-11 items-center justify-center rounded-2xl border transition-colors',
                   isActive
-                    ? 'border-[#CFDECA] bg-[#CFDECA] text-[#212121]'
-                    : 'border-transparent bg-transparent text-[#5C5C5C] hover:border-[#D8DFE9] hover:bg-white hover:text-[#212121]',
+                    ? 'border-[#D0FFA4] bg-[#D0FFA4] text-[#292D32]'
+                    : 'border-transparent bg-white text-[#5E6672] hover:border-[#D0FFA4] hover:text-[#292D32]',
                 ].join(' ')
               }
             >
-              {({ isActive }) => (
-                <>
-                  <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                  {!isCollapsed && <span className="text-sm font-medium">{item.label}</span>}
-                </>
-              )}
+              <item.icon size={18} />
             </NavLink>
           ))}
         </nav>
 
-        {!isCollapsed && (
-          <div className="absolute bottom-4 left-3 right-3 rounded-2xl border border-[#D8DFE9] bg-[#EFF0A3] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#212121]">Scale & Security</p>
-            <p className="mt-1 text-sm text-[#5C5C5C]">
-              Multi-team governance, secure token storage, and audit-ready workflow operations.
-            </p>
-          </div>
-        )}
-      </aside>
-    </>
+        <div className="w-full space-y-2">
+          <button
+            type="button"
+            title={user?.name || 'User'}
+            className="flex h-11 w-full items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white text-[#292D32]"
+          >
+            <UserCircle2 size={18} />
+          </button>
+          <button
+            type="button"
+            title="Sign Out"
+            onClick={logout}
+            className="flex h-11 w-full items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white text-[#5E6672] transition-colors hover:border-[#D0FFA4] hover:text-[#292D32]"
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
+      </div>
+    </aside>
   );
 };
 

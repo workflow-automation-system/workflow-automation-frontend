@@ -22,16 +22,16 @@ const Settings = () => {
   return (
     <div className="mx-auto max-w-6xl space-y-5 font-urbanist">
       <div>
-        <h1 className="text-3xl font-bold text-[#212121]">Settings</h1>
+        <h1 className="text-3xl font-bold text-[#292D32]">Settings</h1>
         <p className="mt-1 text-sm text-[#5C5C5C]">Manage profile, billing, API keys, and platform security preferences.</p>
       </div>
 
       <section className="enterprise-card overflow-hidden">
-        <div className="border-b border-[#D8DFE9] px-5 py-4">
-          <h2 className="text-lg font-semibold text-[#212121]">Profile</h2>
+        <div className="border-b border-[#E2E8F0] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#292D32]">Profile</h2>
         </div>
         <div className="grid gap-4 p-5 md:grid-cols-[auto_1fr]">
-          <div className="flex h-20 w-20 items-center justify-center rounded-3xl border border-[#D8DFE9] bg-[#D8DFE9] text-2xl font-bold text-[#212121]">
+          <div className="flex h-20 w-20 items-center justify-center rounded-3xl border border-[#E2E8F0] bg-[#E2E8F0] text-2xl font-bold text-[#292D32]">
             {user?.name?.charAt(0).toUpperCase() || 'U'}
           </div>
           <div className="grid gap-3 md:grid-cols-2">
@@ -44,17 +44,17 @@ const Settings = () => {
       <section className="enterprise-card p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#D8DFE9] bg-[#CFDECA]">
-              <Building2 size={18} className="text-[#212121]" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E2E8F0] bg-[#D0FFA4]">
+              <Building2 size={18} className="text-[#292D32]" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-[#212121]">Enterprise Plan</h2>
+              <h2 className="text-lg font-semibold text-[#292D32]">Enterprise Plan</h2>
               <p className="text-sm text-[#5C5C5C]">Unlimited workflows, priority support, and advanced governance controls.</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-[#212121]">$299/mo</p>
-            <button type="button" className="mt-2 rounded-xl border border-[#D8DFE9] bg-white px-3 py-2 text-sm font-semibold text-[#212121] hover:border-[#CFDECA]">
+            <p className="text-2xl font-bold text-[#292D32]">$299/mo</p>
+            <button type="button" className="mt-2 rounded-xl border border-[#E2E8F0] bg-white px-3 py-2 text-sm font-semibold text-[#292D32] hover:border-[#D0FFA4]">
               Manage Billing
             </button>
           </div>
@@ -62,8 +62,8 @@ const Settings = () => {
       </section>
 
       <section className="enterprise-card overflow-hidden">
-        <div className="border-b border-[#D8DFE9] px-5 py-4">
-          <h2 className="text-lg font-semibold text-[#212121]">Appearance</h2>
+        <div className="border-b border-[#E2E8F0] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#292D32]">Appearance</h2>
           <p className="text-sm text-[#5C5C5C]">Choose how the workspace should appear.</p>
         </div>
         <div className="grid gap-3 p-5 sm:grid-cols-3">
@@ -74,8 +74,8 @@ const Settings = () => {
       </section>
 
       <section className="enterprise-card overflow-hidden">
-        <div className="border-b border-[#D8DFE9] px-5 py-4">
-          <h2 className="text-lg font-semibold text-[#212121]">API & Webhooks</h2>
+        <div className="border-b border-[#E2E8F0] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#292D32]">API & Webhooks</h2>
         </div>
         <div className="space-y-4 p-5">
           <SecretField
@@ -96,10 +96,10 @@ const Settings = () => {
       </section>
 
       <section className="enterprise-card overflow-hidden">
-        <div className="border-b border-[#D8DFE9] px-5 py-4">
-          <h2 className="text-lg font-semibold text-[#212121]">Notifications</h2>
+        <div className="border-b border-[#E2E8F0] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#292D32]">Notifications</h2>
         </div>
-        <div className="divide-y divide-[#D8DFE9] p-5">
+        <div className="divide-y divide-[#E2E8F0] p-5">
           <ToggleRow
             icon={Bell}
             label="Workflow failure alerts"
@@ -122,8 +122,8 @@ const Settings = () => {
       </section>
 
       <section className="enterprise-card overflow-hidden">
-        <div className="border-b border-[#D8DFE9] px-5 py-4">
-          <h2 className="text-lg font-semibold text-[#212121]">Security</h2>
+        <div className="border-b border-[#E2E8F0] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#292D32]">Security</h2>
         </div>
         <div className="space-y-3 p-5">
           <SecurityAction title="Password" detail="Last changed 30 days ago" actionLabel="Change Password" />
@@ -143,7 +143,7 @@ const Field = ({ label, value }) => (
     <input
       value={value}
       disabled
-      className="w-full rounded-xl border border-[#D8DFE9] bg-white px-3 py-2.5 text-sm text-[#212121]"
+      className="w-full rounded-xl border border-[#E2E8F0] bg-white px-3 py-2.5 text-sm text-[#292D32]"
     />
   </label>
 );
@@ -154,12 +154,12 @@ const ThemeCard = ({ icon: Icon, label, active, onClick }) => (
     onClick={onClick}
     className={[
       'rounded-2xl border p-4 text-left transition-colors',
-      active ? 'border-[#CFDECA] bg-[#CFDECA]/30' : 'border-[#D8DFE9] bg-white hover:border-[#CFDECA]',
+      active ? 'border-[#D0FFA4] bg-[#D0FFA4]/30' : 'border-[#E2E8F0] bg-white hover:border-[#D0FFA4]',
     ].join(' ')}
   >
     <div className="flex items-center gap-2">
-      <Icon size={16} className="text-[#212121]" />
-      <span className="text-sm font-semibold text-[#212121]">{label}</span>
+      <Icon size={16} className="text-[#292D32]" />
+      <span className="text-sm font-semibold text-[#292D32]">{label}</span>
     </div>
   </button>
 );
@@ -168,17 +168,17 @@ const SecretField = ({ icon: Icon, label, value, onCopy, copied }) => (
   <div>
     <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.06em] text-[#5C5C5C]">{label}</span>
     <div className="flex gap-2">
-      <div className="flex flex-1 items-center gap-2 rounded-xl border border-[#D8DFE9] bg-white px-3 py-2.5">
+      <div className="flex flex-1 items-center gap-2 rounded-xl border border-[#E2E8F0] bg-white px-3 py-2.5">
         <Icon size={15} className="text-[#5C5C5C]" />
-        <input value={value} disabled className="w-full bg-transparent text-sm text-[#212121] outline-none" />
+        <input value={value} disabled className="w-full bg-transparent text-sm text-[#292D32] outline-none" />
       </div>
       <button
         type="button"
         onClick={onCopy}
-        className="rounded-xl border border-[#D8DFE9] bg-white px-3 text-[#5C5C5C] hover:border-[#CFDECA]"
+        className="rounded-xl border border-[#E2E8F0] bg-white px-3 text-[#5C5C5C] hover:border-[#D0FFA4]"
         aria-label={`Copy ${label}`}
       >
-        {copied ? <Check size={15} className="text-[#22C55E]" /> : <Copy size={15} />}
+        {copied ? <Check size={15} className="text-[#D0FFA4]" /> : <Copy size={15} />}
       </button>
     </div>
   </div>
@@ -188,12 +188,12 @@ const ToggleRow = ({ icon: Icon, label, checked, onToggle }) => (
   <div className="flex items-center justify-between py-3">
     <div className="flex items-center gap-2">
       <Icon size={15} className="text-[#5C5C5C]" />
-      <span className="text-sm font-medium text-[#212121]">{label}</span>
+      <span className="text-sm font-medium text-[#292D32]">{label}</span>
     </div>
     <button
       type="button"
       onClick={() => onToggle(!checked)}
-      className={`relative h-6 w-11 rounded-full ${checked ? 'bg-[#CFDECA]' : 'bg-[#D8DFE9]'}`}
+      className={`relative h-6 w-11 rounded-full ${checked ? 'bg-[#D0FFA4]' : 'bg-[#E2E8F0]'}`}
     >
       <span
         className={[
@@ -206,11 +206,11 @@ const ToggleRow = ({ icon: Icon, label, checked, onToggle }) => (
 );
 
 const SecurityAction = ({ title, detail, actionLabel, primary = false }) => (
-  <div className="flex flex-col gap-2 rounded-xl border border-[#D8DFE9] bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+  <div className="flex flex-col gap-2 rounded-xl border border-[#E2E8F0] bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
     <div className="flex items-start gap-2">
       <Shield size={15} className="mt-0.5 text-[#5C5C5C]" />
       <div>
-        <p className="text-sm font-semibold text-[#212121]">{title}</p>
+        <p className="text-sm font-semibold text-[#292D32]">{title}</p>
         <p className="text-xs text-[#5C5C5C]">{detail}</p>
       </div>
     </div>
@@ -219,8 +219,8 @@ const SecurityAction = ({ title, detail, actionLabel, primary = false }) => (
       className={[
         'rounded-xl px-3 py-2 text-sm font-semibold',
         primary
-          ? 'bg-[#CFDECA] text-[#212121] hover:bg-[#BECFB8]'
-          : 'border border-[#D8DFE9] bg-white text-[#212121] hover:border-[#CFDECA]',
+          ? 'bg-[#D0FFA4] text-[#292D32] hover:bg-[#BDEB94]'
+          : 'border border-[#E2E8F0] bg-white text-[#292D32] hover:border-[#D0FFA4]',
       ].join(' ')}
     >
       {actionLabel}

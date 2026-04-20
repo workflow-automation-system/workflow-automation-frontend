@@ -33,12 +33,12 @@ const WorkflowDetail = () => {
     return (
       <div className="enterprise-card flex h-72 flex-col items-center justify-center text-center font-urbanist">
         <Workflow size={28} className="text-[#5C5C5C]" />
-        <h2 className="mt-3 text-lg font-semibold text-[#212121]">Workflow not found</h2>
+        <h2 className="mt-3 text-lg font-semibold text-[#292D32]">Workflow not found</h2>
         <p className="mt-1 text-sm text-[#5C5C5C]">The requested workflow does not exist in your workspace.</p>
         <button
           type="button"
           onClick={() => navigate('/workflows')}
-          className="mt-4 rounded-xl bg-[#212121] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3A3A3A]"
+          className="mt-4 rounded-xl bg-[#292D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3C4249]"
         >
           Back to Workflows
         </button>
@@ -60,8 +60,8 @@ const WorkflowDetail = () => {
 
   const edges = (workflow.edges || []).map((edge) => ({
     ...edge,
-    markerEnd: { type: MarkerType.ArrowClosed, color: '#5C5C5C' },
-    style: { stroke: '#5C5C5C', strokeWidth: 2 },
+    markerEnd: { type: MarkerType.ArrowClosed, color: '#D0FFA4' },
+    style: { stroke: '#D0FFA4', strokeWidth: 2.2 },
   }));
 
   const formatDate = (value) => {
@@ -77,19 +77,19 @@ const WorkflowDetail = () => {
             <button
               type="button"
               onClick={() => navigate('/workflows')}
-              className="rounded-xl border border-[#D8DFE9] bg-white p-2 text-[#5C5C5C] hover:border-[#CFDECA]"
+              className="rounded-xl border border-[#E2E8F0] bg-white p-2 text-[#5C5C5C] hover:border-[#D0FFA4]"
             >
               <ArrowLeft size={16} />
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-[#212121]">{workflow.name}</h1>
+                <h1 className="text-2xl font-bold text-[#292D32]">{workflow.name}</h1>
                 <span
                   className={[
                     'rounded-full px-2 py-1 text-xs font-semibold',
                     workflow.status === 'active'
-                      ? 'bg-[#CFDECA] text-[#212121]'
-                      : 'border border-[#D8DFE9] bg-white text-[#5C5C5C]',
+                      ? 'bg-[#D0FFA4] text-[#292D32]'
+                      : 'border border-[#E2E8F0] bg-white text-[#5C5C5C]',
                   ].join(' ')}
                 >
                   {workflow.status === 'active' ? 'Running' : 'Paused'}
@@ -108,8 +108,8 @@ const WorkflowDetail = () => {
               className={[
                 'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold',
                 workflow.status === 'active'
-                  ? 'border border-[#D8DFE9] bg-white text-[#5C5C5C] hover:border-[#CFDECA]'
-                  : 'bg-[#CFDECA] text-[#212121] hover:bg-[#BECFB8]',
+                  ? 'border border-[#E2E8F0] bg-white text-[#5C5C5C] hover:border-[#D0FFA4]'
+                  : 'bg-[#D0FFA4] text-[#292D32] hover:bg-[#BDEB94]',
               ].join(' ')}
             >
               {workflow.status === 'active' ? <Pause size={14} /> : <Play size={14} />}
@@ -118,7 +118,7 @@ const WorkflowDetail = () => {
             <button
               type="button"
               onClick={() => navigate(`/create-workflow?id=${workflow.id}`)}
-              className="inline-flex items-center gap-2 rounded-xl border border-[#D8DFE9] bg-white px-4 py-2 text-sm font-semibold text-[#212121] hover:border-[#CFDECA]"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm font-semibold text-[#292D32] hover:border-[#D0FFA4]"
             >
               <Edit size={14} />
               Edit
@@ -143,12 +143,12 @@ const WorkflowDetail = () => {
       </section>
 
       <section className="enterprise-card overflow-hidden">
-        <div className="flex items-center justify-between border-b border-[#D8DFE9] px-5 py-4">
+        <div className="flex items-center justify-between border-b border-[#E2E8F0] px-5 py-4">
           <div>
-            <h2 className="text-lg font-semibold text-[#212121]">Workflow Canvas</h2>
+            <h2 className="text-lg font-semibold text-[#292D32]">Workflow Canvas</h2>
             <p className="text-sm text-[#5C5C5C]">Read-only topology for branch logic, connector sequencing, and fallback coverage.</p>
           </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#CFDECA] px-3 py-1 text-xs font-semibold text-[#212121]">
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#D0FFA4] px-3 py-1 text-xs font-semibold text-[#292D32]">
             <ShieldCheck size={12} />
             Governed
           </span>
@@ -163,16 +163,16 @@ const WorkflowDetail = () => {
             nodesConnectable={false}
             elementsSelectable={false}
           >
-            <Background gap={24} color="#D8DFE9" />
+            <Background gap={24} color="#E2E8F0" />
             <Controls showInteractive={false} />
-            <MiniMap nodeColor="#CFDECA" maskColor="rgba(246, 245, 250, 0.7)" />
+            <MiniMap nodeColor="#D0FFA4" maskColor="rgba(246, 245, 250, 0.7)" />
           </ReactFlow>
         </div>
       </section>
 
       <section className="enterprise-card overflow-hidden">
-        <div className="border-b border-[#D8DFE9] px-5 py-4">
-          <h2 className="text-lg font-semibold text-[#212121]">Execution History</h2>
+        <div className="border-b border-[#E2E8F0] px-5 py-4">
+          <h2 className="text-lg font-semibold text-[#292D32]">Execution History</h2>
           <p className="text-sm text-[#5C5C5C]">Operational telemetry for workflow reliability monitoring.</p>
         </div>
 
@@ -183,7 +183,7 @@ const WorkflowDetail = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-[#D8DFE9]">
+            <table className="min-w-full divide-y divide-[#E2E8F0]">
               <thead className="bg-white">
                 <tr className="text-left text-xs uppercase tracking-[0.06em] text-[#5C5C5C]">
                   <th className="px-5 py-3">Timestamp</th>
@@ -192,17 +192,17 @@ const WorkflowDetail = () => {
                   <th className="px-5 py-3">Trigger</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#D8DFE9] bg-[#F6F5FA]">
+               <tbody className="divide-y divide-[#E2E8F0] bg-[#F6F5FA]">
                 {executions.map((execution) => (
                   <tr key={execution.id}>
-                    <td className="px-5 py-3 text-sm text-[#212121]">{formatDate(execution.timestamp)}</td>
+                    <td className="px-5 py-3 text-sm text-[#292D32]">{formatDate(execution.timestamp)}</td>
                     <td className="px-5 py-3">
                       <span
                         className={[
                           'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',
                           execution.status === 'success'
-                            ? 'bg-[#CFDECA] text-[#212121]'
-                            : 'bg-[#EFF0A3] text-[#212121]',
+                            ? 'bg-[#D0FFA4] text-[#292D32]'
+                            : 'bg-[#D0FFA4] text-[#292D32]',
                         ].join(' ')}
                       >
                         {execution.status === 'success' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
@@ -221,13 +221,13 @@ const WorkflowDetail = () => {
 
       <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Delete Workflow">
         <p className="mb-5 text-sm text-[#5C5C5C]">
-          Delete <strong className="text-[#212121]">{workflow.name}</strong>? This action cannot be undone.
+          Delete <strong className="text-[#292D32]">{workflow.name}</strong>? This action cannot be undone.
         </p>
         <div className="flex justify-end gap-2">
           <button
             type="button"
             onClick={() => setShowDeleteModal(false)}
-            className="rounded-xl border border-[#D8DFE9] bg-white px-4 py-2 text-sm font-semibold text-[#5C5C5C] hover:border-[#CFDECA]"
+            className="rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm font-semibold text-[#5C5C5C] hover:border-[#D0FFA4]"
           >
             Cancel
           </button>
@@ -250,7 +250,7 @@ const WorkflowDetail = () => {
 const StatCard = ({ label, value }) => (
   <article className="enterprise-card p-4">
     <p className="text-xs uppercase tracking-[0.06em] text-[#5C5C5C]">{label}</p>
-    <p className="mt-2 text-xl font-bold text-[#212121]">{value}</p>
+    <p className="mt-2 text-xl font-bold text-[#292D32]">{value}</p>
   </article>
 );
 

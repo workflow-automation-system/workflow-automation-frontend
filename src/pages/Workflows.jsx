@@ -64,7 +64,7 @@ const Workflows = () => {
     <div className="space-y-5 font-urbanist">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#212121]">Workflows</h1>
+          <h1 className="text-3xl font-bold text-[#292D32]">Workflows</h1>
           <p className="mt-1 text-sm text-[#5C5C5C]">
             Build and operate enterprise automations with controlled branching, retry logic, and execution history.
           </p>
@@ -72,7 +72,7 @@ const Workflows = () => {
         <button
           type="button"
           onClick={() => navigate('/create-workflow')}
-          className="inline-flex items-center gap-2 rounded-2xl bg-[#212121] px-5 py-3 text-sm font-semibold text-white hover:bg-[#3A3A3A]"
+          className="inline-flex items-center gap-2 rounded-2xl bg-[#292D32] px-5 py-3 text-sm font-semibold text-white hover:bg-[#3C4249]"
         >
           <Plus size={16} />
           Create Workflow
@@ -82,15 +82,15 @@ const Workflows = () => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="enterprise-card p-5">
           <p className="text-sm text-[#5C5C5C]">Total Workflows</p>
-          <p className="mt-2 text-3xl font-bold text-[#212121]">{stats.total}</p>
+          <p className="mt-2 text-3xl font-bold text-[#292D32]">{stats.total}</p>
         </div>
         <div className="enterprise-card p-5">
           <p className="text-sm text-[#5C5C5C]">Active Scenarios</p>
-          <p className="mt-2 text-3xl font-bold text-[#212121]">{stats.active}</p>
+          <p className="mt-2 text-3xl font-bold text-[#292D32]">{stats.active}</p>
         </div>
         <div className="enterprise-card p-5">
           <p className="text-sm text-[#5C5C5C]">Execution Count</p>
-          <p className="mt-2 text-3xl font-bold text-[#212121]">{stats.executions.toLocaleString()}</p>
+          <p className="mt-2 text-3xl font-bold text-[#292D32]">{stats.executions.toLocaleString()}</p>
         </div>
       </div>
 
@@ -102,7 +102,7 @@ const Workflows = () => {
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Search workflows"
-            className="w-full rounded-2xl border border-[#D8DFE9] bg-white py-3 pl-10 pr-4 text-sm text-[#212121] focus:border-[#CFDECA] focus:outline-none"
+            className="w-full rounded-2xl border border-[#E2E8F0] bg-white py-3 pl-10 pr-4 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none"
           />
         </div>
         <div className="flex gap-2">
@@ -114,8 +114,8 @@ const Workflows = () => {
               className={[
                 'rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors',
                 statusFilter === status
-                  ? 'border-[#212121] bg-[#212121] text-white'
-                  : 'border-[#D8DFE9] bg-white text-[#5C5C5C] hover:border-[#CFDECA]',
+                  ? 'border-[#292D32] bg-[#292D32] text-white'
+                  : 'border-[#E2E8F0] bg-white text-[#5C5C5C] hover:border-[#D0FFA4]',
               ].join(' ')}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -126,10 +126,10 @@ const Workflows = () => {
 
       {filteredWorkflows.length === 0 ? (
         <section className="enterprise-card p-10 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#D8DFE9] bg-white">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white">
             <GitBranch size={24} className="text-[#5C5C5C]" />
           </div>
-          <h2 className="mt-4 text-lg font-semibold text-[#212121]">No workflows found</h2>
+          <h2 className="mt-4 text-lg font-semibold text-[#292D32]">No workflows found</h2>
           <p className="mt-1 text-sm text-[#5C5C5C]">Adjust your filters or create a new workflow.</p>
         </section>
       ) : (
@@ -154,13 +154,13 @@ const Workflows = () => {
         title="Delete Workflow"
       >
         <p className="mb-5 text-sm text-[#5C5C5C]">
-          Delete <strong className="text-[#212121]">{deleteModal.workflow?.name}</strong>? This action cannot be undone.
+          Delete <strong className="text-[#292D32]">{deleteModal.workflow?.name}</strong>? This action cannot be undone.
         </p>
         <div className="flex justify-end gap-2">
           <button
             type="button"
             onClick={() => setDeleteModal({ open: false, workflow: null })}
-            className="rounded-xl border border-[#D8DFE9] bg-white px-4 py-2 text-sm font-semibold text-[#5C5C5C] hover:border-[#CFDECA]"
+            className="rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm font-semibold text-[#5C5C5C] hover:border-[#D0FFA4]"
           >
             Cancel
           </button>
@@ -190,15 +190,15 @@ const WorkflowCard = ({ workflow, onView, onEdit, onToggle, onDelete, formatDate
       <div className="p-5">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#D8DFE9] bg-[#CFDECA]">
-              <GitBranch size={18} className="text-[#212121]" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E2E8F0] bg-[#D0FFA4]">
+              <GitBranch size={18} className="text-[#292D32]" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#212121]">{workflow.name}</p>
+              <p className="text-sm font-semibold text-[#292D32]">{workflow.name}</p>
               <span
                 className={[
                   'inline-flex rounded-full px-2 py-1 text-[11px] font-semibold',
-                  workflow.status === 'active' ? 'bg-[#CFDECA] text-[#212121]' : 'bg-white text-[#5C5C5C] border border-[#D8DFE9]',
+                  workflow.status === 'active' ? 'bg-[#D0FFA4] text-[#292D32]' : 'bg-white text-[#5C5C5C] border border-[#E2E8F0]',
                 ].join(' ')}
               >
                 {workflow.status === 'active' ? 'Running' : 'Paused'}
@@ -216,40 +216,40 @@ const WorkflowCard = ({ workflow, onView, onEdit, onToggle, onDelete, formatDate
             </button>
 
             {showMenu && (
-              <div className="absolute right-0 z-10 mt-1 w-44 rounded-xl border border-[#D8DFE9] bg-white p-1 shadow-lg">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onView();
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#212121] hover:bg-[#F6F5FA]"
-                >
-                  <Eye size={14} />
-                  View
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onEdit();
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#212121] hover:bg-[#F6F5FA]"
-                >
-                  <Edit size={14} />
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onToggle();
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#212121] hover:bg-[#F6F5FA]"
-                >
-                  {workflow.status === 'active' ? <Pause size={14} /> : <Play size={14} />}
-                  {workflow.status === 'active' ? 'Disable' : 'Enable'}
-                </button>
+              <div className="absolute right-0 z-10 mt-1 w-44 rounded-xl border border-[#E2E8F0] bg-white p-1 shadow-lg">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      onView();
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#292D32] hover:bg-[#F6F5FA]"
+                  >
+                    <Eye size={14} />
+                    View
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      onEdit();
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#292D32] hover:bg-[#F6F5FA]"
+                  >
+                    <Edit size={14} />
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      onToggle();
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#292D32] hover:bg-[#F6F5FA]"
+                  >
+                    {workflow.status === 'active' ? <Pause size={14} /> : <Play size={14} />}
+                    {workflow.status === 'active' ? 'Disable' : 'Enable'}
+                  </button>
                 <button
                   type="button"
                   onClick={() => {
@@ -282,11 +282,11 @@ const WorkflowCard = ({ workflow, onView, onEdit, onToggle, onDelete, formatDate
         </div>
       </div>
 
-      <div className="border-t border-[#D8DFE9] px-5 py-3">
+      <div className="border-t border-[#E2E8F0] px-5 py-3">
         <button
           type="button"
           onClick={onView}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#212121] hover:text-[#3A3A3A]"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[#292D32] hover:text-[#3C4249]"
         >
           Open Workflow
           <ArrowRight size={14} />
