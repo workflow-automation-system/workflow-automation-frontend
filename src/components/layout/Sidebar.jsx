@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Building2,
   LayoutGrid,
@@ -13,29 +13,39 @@ import {
 import useAuthStore from '../../stores/authStore';
 
 const navItems = [
-  { path: '/', icon: LayoutGrid, label: 'Overview' },
-  { path: '/organisation', icon: Building2, label: 'Organisation' },
-  { path: '/workflows', icon: Workflow, label: 'Workflows' },
-  { path: '/app-connections', icon: Plug, label: 'App Connections' },
-  { path: '/templates', icon: Layers, label: 'Templates' },
-  { path: '/settings', icon: Settings, label: 'Settings' },
+  { path: '/',                icon: LayoutGrid, label: 'Overview' },
+  { path: '/organisation',    icon: Building2,  label: 'Organisation' },
+  { path: '/workflows',       icon: Workflow,   label: 'Workflows' },
+  { path: '/app-connections', icon: Plug,       label: 'App Connections' },
+  { path: '/templates',       icon: Layers,     label: 'Templates' },
+  { path: '/settings',        icon: Settings,   label: 'Settings' },
 ];
 
 const Sidebar = () => {
   const { logout, user } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
-    <aside className="fixed left-0 top-0 z-50 h-screen w-20 border-r border-[#E2E8F0]  p-3">
+    <aside className="fixed left-0 top-0 z-50 h-screen w-20 border-r border-[#E2E8F0] bg-white p-3">
       <div className="flex h-full flex-col items-center">
+
+        {/* Logo */}
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white">
           <Workflow size={20} className="text-[#292D32]" />
         </div>
 
+        {/* Nav links */}
         <nav className="flex flex-1 flex-col items-center justify-center gap-2">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
+              end={item.path === '/'}
               title={item.label}
               className={({ isActive }) =>
                 [
@@ -51,6 +61,7 @@ const Sidebar = () => {
           ))}
         </nav>
 
+        {/* Bottom — user + logout */}
         <div className="w-full space-y-2">
           <button
             type="button"
@@ -62,12 +73,13 @@ const Sidebar = () => {
           <button
             type="button"
             title="Sign Out"
-            onClick={logout}
-            className="flex h-11 w-full items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white text-[#5E6672] transition-colors hover:border-[#D0FFA4] hover:text-[#292D32]"
+            onClick={handleLogout}
+            className="flex h-11 w-full items-center justify-center rounded-2xl border border-[#E2E8F0] bg-white text-[#5E6672] transition-colors hover:border-red-200 hover:text-red-500"
           >
             <LogOut size={16} />
           </button>
         </div>
+
       </div>
     </aside>
   );

@@ -1,32 +1,20 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-const useThemeStore = create(
-  persist(
-    (set) => ({
-      theme: 'light',
-      setTheme: (theme) => {
-        document.documentElement.setAttribute('data-theme', theme);
-        set({ theme });
-      },
-      toggleTheme: () => {
-        set((state) => {
-          const newTheme = state.theme === 'light' ? 'dark' : 'light';
-          document.documentElement.setAttribute('data-theme', newTheme);
-          return { theme: newTheme };
-        });
-      },
-      initTheme: () => {
-        set((state) => {
-          document.documentElement.setAttribute('data-theme', state.theme);
-          return {};
-        });
-      },
+const useThemeStore = create((set) => ({
+  theme: localStorage.getItem('theme') || 'light',
+
+  toggleTheme: () =>
+    set((state) => {
+      const newTheme = state.theme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme', newTheme);
+      document.documentElement.classList.toggle('dark', newTheme === 'dark');
+      return { theme: newTheme };
     }),
-    {
-      name: 'theme-storage',
-    }
-  )
-);
+
+  initTheme: () => {
+    const saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.classList.toggle('dark', saved === 'dark');
+  },
+}));
 
 export default useThemeStore;

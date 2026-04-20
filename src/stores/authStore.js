@@ -1,80 +1,75 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import authService from '../services/authService';
 
-// Mock users for demonstration
-const mockUsers = [
-  { id: '1', email: 'admin@example.com', password: 'admin123', name: 'Admin User' },
-  { id: '2', email: 'user@example.com', password: 'user123', name: 'Demo User' },
-];
+const useAuthStore = create((set) => ({
+  user: null,
+  token: localStorage.getItem('token') || null,
+  isAuthenticated: !!localStorage.getItem('token'),
+  isLoading: false,
+  error: null,
 
-const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-      error: null,
-
-      login: async (email, password) => {
-        set({ isLoading: true, error: null });
-
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const user = mockUsers.find((u) => u.email === email && u.password === password);
-
-        if (user) {
-          const { password: _, ...userWithoutPassword } = user;
-          set({ user: userWithoutPassword, isAuthenticated: true, isLoading: false });
-          return { success: true };
-        } else {
-          set({ error: 'Invalid email or password', isLoading: false });
-          return { success: false, error: 'Invalid email or password' };
-        }
-      },
-
-      register: async (email, password, name) => {
-        set({ isLoading: true, error: null });
-
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const existingUser = mockUsers.find((u) => u.email === email);
-
-        if (existingUser) {
-          set({ error: 'Email already exists', isLoading: false });
-          return { success: false, error: 'Email already exists' };
-        }
-
-        const newUser = {
-          id: String(mockUsers.length + 1),
-          email,
-          password,
-          name,
-        };
-        mockUsers.push(newUser);
-
-        const { password: _, ...userWithoutPassword } = newUser;
-        set({ user: userWithoutPassword, isAuthenticated: true, isLoading: false });
-        return { success: true };
-      },
-
-      logout: () => {
-        set({ user: null, isAuthenticated: false, error: null });
-      },
-
-      clearError: () => {
-        set({ error: null });
-      },
-    }),
-    {
-      name: 'auth-storage',
-      partialize: (state) => ({
-        user: state.user,
-        isAuthenticated: state.isAuthenticated,
-      }),
+  // Appeler au démarrage de l'app pour recharger l'utilisateur
+  init: async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const user = await authService.me();
+      set({ user, isAuthenticated: true });
+    } catch {
+      localStorage.removeItem('token');
+      set({ user: null, token: null, isAuthenticated: false });
     }
-  )
-);
+  },
+
+  register: async (email, password, name) => {
+    set({ isLoading: true, error: null });
+    try {
+      const data = await authService.register(email, password, name);
+      localStorage.setItem('token', data.token);
+      set({
+        user: { email: data.email, name: data.name, role: data.role },
+        token: data.token,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+      return { success: true };
+    } catch (err) {
+      const message = err.response?.data?.message || "Erreur lors de l'inscription";
+      set({ error: message, isLoading: false });
+      return { success: false, error: message };
+    }
+  },
+
+  login: async (email, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const data = await authService.login(email, password);
+      localStorage.setItem('token', data.token);
+      set({
+        user: { email: data.email, name: data.name, role: data.role },
+        token: data.token,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+      return { success: true };
+    } catch (err) {
+      const message = err.response?.data?.message || 'Email ou mot de passe incorrect';
+      set({ error: message, isLoading: false });
+      return { success: false, error: message };
+    }
+  },
+
+  logout: () => {
+    localStorage.removeItem('token');
+    set({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      error: null,
+    });
+  },
+
+  clearError: () => set({ error: null }),
+}));
 
 export default useAuthStore;
