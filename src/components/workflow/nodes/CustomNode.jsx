@@ -13,7 +13,6 @@ import {
   Table2,
   Zap,
 } from 'lucide-react';
-import { nodeTypes } from '../../../mock/data';
 
 const iconMap = {
   Zap,
@@ -27,6 +26,20 @@ const iconMap = {
   Mail,
   Globe,
   Clock,
+};
+
+const nodeIconByType = {
+  trigger: 'Zap',
+  condition: 'GitBranch',
+  data_mapper: 'Table2',
+  error_handler: 'ShieldAlert',
+  notion: 'BookCopy',
+  google_sheets: 'Sheet',
+  chatgpt: 'Bot',
+  slack: 'MessageSquare',
+  email: 'Mail',
+  webhook: 'Globe',
+  delay: 'Clock',
 };
 
 const nodeBg = {
@@ -68,13 +81,13 @@ const getSubtitle = (type, data) => {
     case 'delay':
       return data?.duration ? `${data.duration} ${data.unit}` : '5 minutes';
     default:
-      return 'Configure node';
+      return data?.entity || data?.functionKey || 'Configure node';
   }
 };
 
 const CustomNode = ({ data, selected, type }) => {
-  const nodeConfig = nodeTypes.find((node) => node.type === type);
-  const Icon = iconMap[nodeConfig?.icon] || Zap;
+  const iconKey = data?.icon || nodeIconByType[type];
+  const Icon = iconMap[iconKey] || Zap;
 
   return (
     <div
@@ -94,13 +107,13 @@ const CustomNode = ({ data, selected, type }) => {
       <div className="flex items-center gap-3">
         <div
           className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#E2E8F0]"
-          style={{ backgroundColor: nodeBg[type] || '#D0FFA4' }}
+          style={{ backgroundColor: data?.color || nodeBg[type] || '#D0FFA4' }}
         >
           <Icon size={16} className="text-[#292D32]" />
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-[#292D32]">
-            {data?.label || nodeConfig?.label || 'Node'}
+            {data?.label || data?.functionLabel || type || 'Node'}
           </p>
           <p className="truncate text-xs text-[#5C5C5C]">{getSubtitle(type, data)}</p>
         </div>

@@ -1,6 +1,12 @@
 import React from 'react';
 import { Settings2, Trash2, X } from 'lucide-react';
-import { nodeTypes } from '../../mock/data';
+import {
+  createNodeDataFromFunction,
+  FALLBACK_WORKFLOW_CONFIGURATION,
+  getFirstFunctionForEntity,
+  getFunctionDefinition,
+  normalizeEntity,
+} from '../../services/workflowConverter';
 
 const nodeColor = {
   trigger: '#D0FFA4',
@@ -19,15 +25,43 @@ const nodeColor = {
 const inputStyle =
   'w-full rounded-xl border border-[#E2E8F0] bg-white px-3 py-2.5 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none';
 
-const ConfigPanel = ({ node, onClose, onUpdate, onDelete }) => {
-  const nodeConfig = nodeTypes.find((item) => item.type === node.type);
+const ConfigPanel = ({ node, onClose, onUpdate, onDelete, workflowConfiguration }) => {
+  const activeConfiguration =
+    Array.isArray(workflowConfiguration?.functions) && workflowConfiguration.functions.length > 0
+      ? workflowConfiguration
+      : FALLBACK_WORKFLOW_CONFIGURATION;
+  const activeFunctionKey = node.data?.functionKey || node.type;
+  const nodeConfig =
+    getFunctionDefinition(activeConfiguration, activeFunctionKey) ||
+    getFirstFunctionForEntity(activeConfiguration, node.data?.entity || node.type);
+  const selectedEntity = normalizeEntity(node.data?.entity || nodeConfig?.entity, activeFunctionKey);
+  const availableEntities =
+    Array.isArray(activeConfiguration.entities) && activeConfiguration.entities.length > 0
+      ? activeConfiguration.entities
+      : FALLBACK_WORKFLOW_CONFIGURATION.entities;
+  const availableFunctions = activeConfiguration.functions.filter(
+    (item) => item.entity === selectedEntity
+  );
+  const functionOptions = availableFunctions.length ? availableFunctions : activeConfiguration.functions;
 
   const update = (field, value) => {
     onUpdate(node.id, { [field]: value });
   };
 
+  const updateNodeFunction = (entity, functionKey) => {
+    const nextFunction =
+      getFunctionDefinition(activeConfiguration, functionKey) ||
+      getFirstFunctionForEntity(activeConfiguration, entity);
+    if (!nextFunction) return;
+
+    const nextData = createNodeDataFromFunction(nextFunction, {
+      label: node.data?.label || nextFunction.label,
+    });
+    onUpdate(node.id, { ...nextData, __nodeType: nextFunction.key });
+  };
+
   const renderFields = () => {
-    switch (node.type) {
+    switch (activeFunctionKey) {
       case 'trigger':
         return (
           <>
@@ -301,7 +335,24 @@ const ConfigPanel = ({ node, onClose, onUpdate, onDelete }) => {
           </>
         );
       default:
-        return null;
+        return (
+          <Field label="Configuration JSON">
+            <textarea
+              value={JSON.stringify(node.data || {}, null, 2)}
+              onChange={(event) => {
+                try {
+                  const parsed = JSON.parse(event.target.value);
+                  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                    onUpdate(node.id, parsed);
+                  }
+                } catch (error) {
+                  // Keep editing experience tolerant of incomplete JSON.
+                }
+              }}
+              className={`${inputStyle} min-h-[120px] resize-y font-mono text-xs`}
+            />
+          </Field>
+        );
     }
   };
 
@@ -311,7 +362,7 @@ const ConfigPanel = ({ node, onClose, onUpdate, onDelete }) => {
         <div className="flex items-center gap-3">
           <span
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#E2E8F0]"
-            style={{ backgroundColor: nodeColor[node.type] || '#D0FFA4' }}
+            style={{ backgroundColor: node.data?.color || nodeColor[node.type] || '#D0FFA4' }}
           >
             <Settings2 size={16} className="text-[#292D32]" />
           </span>
@@ -332,6 +383,36 @@ const ConfigPanel = ({ node, onClose, onUpdate, onDelete }) => {
       </div>
 
       <div className="max-h-[calc(100vh-18rem)] space-y-3 overflow-y-auto p-4">
+        <Field label="Entity">
+          <select
+            value={selectedEntity}
+            onChange={(event) => {
+              const nextEntity = event.target.value;
+              const firstFunction = getFirstFunctionForEntity(activeConfiguration, nextEntity);
+              updateNodeFunction(nextEntity, firstFunction?.key);
+            }}
+            className={inputStyle}
+          >
+            {availableEntities.map((entity) => (
+              <option key={entity} value={entity}>
+                {entity}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Function">
+          <select
+            value={activeFunctionKey}
+            onChange={(event) => updateNodeFunction(selectedEntity, event.target.value)}
+            className={inputStyle}
+          >
+            {functionOptions.map((item) => (
+              <option key={item.key} value={item.key}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </Field>
         <Field label="Label">
           <input
             value={node.data?.label || ''}

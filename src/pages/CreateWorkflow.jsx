@@ -16,10 +16,16 @@ import ConfigPanel from '../components/workflow/ConfigPanel';
 import NodeSidebar from '../components/workflow/NodeSidebar';
 import CustomNode from '../components/workflow/nodes/CustomNode';
 import Toast from '../components/ui/Toast';
-import { generateId, nodeTypes } from '../mock/data';
+import { generateId } from '../mock/data';
+import { workflowApi } from '../api/workflowApi';
+import {
+  createNodeDataFromFunction,
+  FALLBACK_WORKFLOW_CONFIGURATION,
+  getFunctionDefinition,
+  normalizeWorkflowConfiguration,
+} from '../services/workflowConverter';
 import useWorkflowStore from '../stores/workflowStore';
 
-const nodeTypesMap = Object.fromEntries(nodeTypes.map((node) => [node.type, CustomNode]));
 const ALLOWED_STATUSES = ['ACTIVE', 'INACTIVE'];
 
 const CreateWorkflow = () => {
@@ -36,12 +42,92 @@ const CreateWorkflow = () => {
   const [selectedNode, setSelectedNode] = React.useState(null);
   const [saving, setSaving] = React.useState(false);
   const [loadingWorkflow, setLoadingWorkflow] = React.useState(false);
+  const [loadingConfiguration, setLoadingConfiguration] = React.useState(false);
+  const [workflowConfiguration, setWorkflowConfiguration] = React.useState(
+    FALLBACK_WORKFLOW_CONFIGURATION
+  );
   const [reactFlowInstance, setReactFlowInstance] = React.useState(null);
   const [toast, setToast] = React.useState({ open: false, message: '', tone: 'info' });
 
   const showToast = React.useCallback((message, tone = 'info') => {
     setToast({ open: true, message, tone });
   }, []);
+
+  const nodeTypesMap = React.useMemo(() => {
+    const map = {};
+    const configuredFunctions = Array.isArray(workflowConfiguration?.functions)
+      ? workflowConfiguration.functions
+      : [];
+    configuredFunctions.forEach((item) => {
+      if (item?.key) {
+        map[item.key] = CustomNode;
+      }
+    });
+    nodes.forEach((node) => {
+      if (node?.type) {
+        map[node.type] = CustomNode;
+      }
+    });
+
+    if (!Object.keys(map).length) {
+      map.trigger = CustomNode;
+    }
+
+    return map;
+  }, [nodes, workflowConfiguration]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    const loadConfiguration = async () => {
+      setLoadingConfiguration(true);
+      try {
+        const configuration = await workflowApi.getConfiguration();
+        if (!cancelled) {
+          setWorkflowConfiguration(normalizeWorkflowConfiguration(configuration));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setWorkflowConfiguration(FALLBACK_WORKFLOW_CONFIGURATION);
+          showToast('Using fallback workflow configuration.', 'info');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingConfiguration(false);
+        }
+      }
+    };
+
+    loadConfiguration();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [showToast]);
+
+  const hydrateNodeWithConfiguration = React.useCallback(
+    (node) => {
+      if (!node) return node;
+      const functionDefinition =
+        getFunctionDefinition(workflowConfiguration, node.data?.functionKey || node.type) ||
+        getFunctionDefinition(FALLBACK_WORKFLOW_CONFIGURATION, node.type);
+      if (!functionDefinition) return node;
+
+      return {
+        ...node,
+        type: functionDefinition.key,
+        data: createNodeDataFromFunction(functionDefinition, node.data || {}),
+      };
+    },
+    [workflowConfiguration]
+  );
+
+  React.useEffect(() => {
+    setNodes((currentNodes) => currentNodes.map((node) => hydrateNodeWithConfiguration(node)));
+    setSelectedNode((currentNode) =>
+      currentNode ? hydrateNodeWithConfiguration(currentNode) : currentNode
+    );
+  }, [hydrateNodeWithConfiguration, setNodes]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -62,7 +148,11 @@ const CreateWorkflow = () => {
           setName(existingWorkflow.name || '');
           setDescription(existingWorkflow.description || '');
           setStatus((existingWorkflow.status || 'ACTIVE').toUpperCase());
-          setNodes(Array.isArray(existingWorkflow.nodes) ? existingWorkflow.nodes : []);
+          setNodes(
+            Array.isArray(existingWorkflow.nodes)
+              ? existingWorkflow.nodes.map((node) => hydrateNodeWithConfiguration(node))
+              : []
+          );
           setEdges(Array.isArray(existingWorkflow.edges) ? existingWorkflow.edges : []);
         }
       } catch (err) {
@@ -81,7 +171,15 @@ const CreateWorkflow = () => {
     return () => {
       cancelled = true;
     };
-  }, [fetchWorkflowById, getWorkflowById, workflowId, setEdges, setNodes, showToast]);
+  }, [
+    fetchWorkflowById,
+    getWorkflowById,
+    hydrateNodeWithConfiguration,
+    workflowId,
+    setEdges,
+    setNodes,
+    showToast,
+  ]);
 
   const onConnect = React.useCallback(
     (connection) => {
@@ -111,20 +209,20 @@ const CreateWorkflow = () => {
         y: event.clientY,
       });
 
-      const template = nodeTypes.find((node) => node.type === type);
+      const template = getFunctionDefinition(workflowConfiguration, type);
       if (!template) return;
 
       setNodes((currentNodes) => [
         ...currentNodes,
         {
           id: generateId('node'),
-          type,
+          type: template.key,
           position,
-          data: { ...template.defaultData },
+          data: createNodeDataFromFunction(template, template.defaultData),
         },
       ]);
     },
-    [reactFlowInstance, setNodes]
+    [reactFlowInstance, setNodes, workflowConfiguration]
   );
 
   const handleSave = async () => {
@@ -178,14 +276,31 @@ const CreateWorkflow = () => {
   };
 
   const handleUpdateNodeData = (nodeId, updatedData) => {
+    const nextData = updatedData && typeof updatedData === 'object' ? updatedData : {};
+    const nextNodeType = nextData.__nodeType;
+    const sanitizedData = { ...nextData };
+    delete sanitizedData.__nodeType;
+
     setNodes((currentNodes) =>
       currentNodes.map((node) =>
-        node.id === nodeId ? { ...node, data: { ...node.data, ...updatedData } } : node
+        node.id === nodeId
+          ? {
+              ...node,
+              type: nextNodeType || node.type,
+              data: { ...node.data, ...sanitizedData },
+            }
+          : node
       )
     );
 
     setSelectedNode((current) =>
-      current?.id === nodeId ? { ...current, data: { ...current.data, ...updatedData } } : current
+      current?.id === nodeId
+        ? {
+            ...current,
+            type: nextNodeType || current.type,
+            data: { ...current.data, ...sanitizedData },
+          }
+        : current
     );
   };
 
@@ -236,7 +351,7 @@ const CreateWorkflow = () => {
             <button
               type="button"
               onClick={handleSave}
-              disabled={saving || loadingWorkflow}
+              disabled={saving || loadingWorkflow || loadingConfiguration}
               className="inline-flex items-center gap-2 rounded-xl bg-[#292D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3C4249] disabled:opacity-60"
             >
               <Save size={14} />
@@ -247,7 +362,7 @@ const CreateWorkflow = () => {
       </header>
 
       <div className="grid gap-4 xl:grid-cols-[290px_1fr_320px]">
-        <NodeSidebar />
+        <NodeSidebar workflowConfiguration={workflowConfiguration} />
 
         <section className="enterprise-card flex min-h-[520px] flex-col overflow-hidden">
           <div className="flex items-center justify-between border-b border-[#E2E8F0] bg-[#F6F5FA] px-4 py-3">
@@ -313,6 +428,7 @@ const CreateWorkflow = () => {
             onClose={() => setSelectedNode(null)}
             onUpdate={handleUpdateNodeData}
             onDelete={handleDeleteNode}
+            workflowConfiguration={workflowConfiguration}
           />
         ) : (
           <aside className="enterprise-card hidden p-4 text-sm text-[#5C5C5C] xl:block">
@@ -344,6 +460,11 @@ const CreateWorkflow = () => {
       {loadingWorkflow && workflowId ? (
         <div className="fixed bottom-5 left-1/2 z-[60] -translate-x-1/2 rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm text-[#292D32] shadow-lg">
           Loading workflow...
+        </div>
+      ) : null}
+      {loadingConfiguration ? (
+        <div className="fixed bottom-16 left-1/2 z-[60] -translate-x-1/2 rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm text-[#292D32] shadow-lg">
+          Syncing backend entities and functions...
         </div>
       ) : null}
 

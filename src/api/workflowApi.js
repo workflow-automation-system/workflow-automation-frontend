@@ -1,78 +1,18 @@
-import { API_BASE_URL, EXECUTIONS_ENDPOINT, WORKFLOWS_ENDPOINT } from './config';
-
-const ALLOWED_STATUSES = ['ACTIVE', 'INACTIVE'];
+import {
+  API_BASE_URL,
+  EXECUTIONS_ENDPOINT,
+  WORKFLOW_CONFIGURATION_ENDPOINT,
+  WORKFLOWS_ENDPOINT,
+} from './config';
+import {
+  FALLBACK_WORKFLOW_CONFIGURATION,
+  normalizeWorkflowConfiguration,
+  normalizeWorkflow,
+  buildMutationPayload,
+  extractPayload,
+} from '../services/workflowConverter';
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-
-const safeTrim = (value) => (typeof value === 'string' ? value.trim() : '');
-
-const normalizeStatus = (status, fallback = 'INACTIVE') => {
-  const normalized = String(status || fallback).toUpperCase();
-  return ALLOWED_STATUSES.includes(normalized) ? normalized : fallback;
-};
-
-const normalizeNodes = (nodes) => (Array.isArray(nodes) ? nodes : []);
-const normalizeEdges = (edges) => (Array.isArray(edges) ? edges : []);
-
-const normalizeWorkflow = (workflow = {}) => {
-  const nodes = normalizeNodes(workflow.nodes);
-  const nodeCount = Number.isFinite(workflow.nodeCount) ? workflow.nodeCount : nodes.length;
-
-  return {
-    ...workflow,
-    id: workflow.id ?? workflow.workflowId ?? null,
-    name: safeTrim(workflow.name) || 'Untitled workflow',
-    description: safeTrim(workflow.description),
-    status: normalizeStatus(workflow.status),
-    nodes,
-    edges: normalizeEdges(workflow.edges),
-    nodeCount,
-    executionCount: Number.isFinite(workflow.executionCount) ? workflow.executionCount : 0,
-    createdAt: workflow.createdAt || workflow.created_at || null,
-    updatedAt: workflow.updatedAt || workflow.updated_at || null,
-    lastExecution: workflow.lastExecution || workflow.lastExecutedAt || null,
-  };
-};
-
-const extractPayload = (payload) => {
-  if (Array.isArray(payload)) {
-    return payload;
-  }
-
-  if (!isObject(payload)) {
-    return payload ?? null;
-  }
-
-  if (Array.isArray(payload.data)) {
-    return payload.data;
-  }
-
-  if (Array.isArray(payload.workflows)) {
-    return payload.workflows;
-  }
-
-  if (isObject(payload.data)) {
-    return payload.data;
-  }
-
-  return payload;
-};
-
-const buildMutationPayload = (payload = {}, { requireName = true } = {}) => {
-  const name = safeTrim(payload.name);
-  const description = safeTrim(payload.description);
-  const status = normalizeStatus(payload.status, 'ACTIVE');
-
-  if (requireName && !name) {
-    throw new Error('Workflow name is required.');
-  }
-
-  if (!ALLOWED_STATUSES.includes(status)) {
-    throw new Error('Status must be ACTIVE or INACTIVE.');
-  }
-
-  return { name, description, status };
-};
 
 async function parseJsonSafely(response) {
   if (response.status === 204) {
@@ -132,11 +72,17 @@ async function request(path, options = {}) {
   }
 }
 
+export async function getWorkflowConfiguration() {
+  const response = await request(WORKFLOW_CONFIGURATION_ENDPOINT);
+  const payload = extractPayload(response);
+  return normalizeWorkflowConfiguration(payload);
+}
+
 export async function getWorkflows() {
   const response = await request(WORKFLOWS_ENDPOINT);
   const payload = extractPayload(response);
   const workflows = Array.isArray(payload) ? payload : [];
-  return workflows.map(normalizeWorkflow);
+  return workflows.map((workflow) => normalizeWorkflow(workflow, FALLBACK_WORKFLOW_CONFIGURATION));
 }
 
 export async function createWorkflow(payload) {
@@ -146,13 +92,17 @@ export async function createWorkflow(payload) {
   });
 
   const normalized = extractPayload(response);
-  return isObject(normalized) ? normalizeWorkflow(normalized) : null;
+  return isObject(normalized)
+    ? normalizeWorkflow(normalized, FALLBACK_WORKFLOW_CONFIGURATION)
+    : null;
 }
 
 export async function getWorkflowById(id) {
   const response = await request(`${WORKFLOWS_ENDPOINT}/${id}`);
   const normalized = extractPayload(response);
-  return isObject(normalized) ? normalizeWorkflow(normalized) : null;
+  return isObject(normalized)
+    ? normalizeWorkflow(normalized, FALLBACK_WORKFLOW_CONFIGURATION)
+    : null;
 }
 
 export async function updateWorkflow(id, payload) {
@@ -162,7 +112,9 @@ export async function updateWorkflow(id, payload) {
   });
 
   const normalized = extractPayload(response);
-  return isObject(normalized) ? normalizeWorkflow(normalized) : null;
+  return isObject(normalized)
+    ? normalizeWorkflow(normalized, FALLBACK_WORKFLOW_CONFIGURATION)
+    : null;
 }
 
 export async function deleteWorkflow(id) {
@@ -184,6 +136,7 @@ export const workflowApi = {
   update: updateWorkflow,
   delete: deleteWorkflow,
   execute: executeWorkflow,
+  getConfiguration: getWorkflowConfiguration,
 };
 
 export default workflowApi;

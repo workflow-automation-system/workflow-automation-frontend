@@ -2,20 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
-  ArrowRight,
-  Clock,
-  Edit,
-  Eye,
   GitBranch,
-  MoreVertical,
-  Pause,
-  Play,
   Plus,
   Search,
-  Trash2,
 } from 'lucide-react';
 import Modal from '../components/ui/Modal';
 import Toast from '../components/ui/Toast';
+import WorkflowCard from '../components/workflow/WorkflowCard';
+import WorkflowCardSkeleton from '../components/workflow/WorkflowCardSkeleton';
 import useWorkflowStore from '../stores/workflowStore';
 
 const STATUS_FILTERS = [
@@ -23,8 +17,6 @@ const STATUS_FILTERS = [
   { key: 'ACTIVE', label: 'Active' },
   { key: 'INACTIVE', label: 'Inactive' },
 ];
-
-const ALLOWED_STATUSES = ['ACTIVE', 'INACTIVE'];
 
 const useDebouncedValue = (value, delay = 250) => {
   const [debouncedValue, setDebouncedValue] = React.useState(value);
@@ -39,28 +31,14 @@ const useDebouncedValue = (value, delay = 250) => {
 
 const formatDate = (value) => {
   if (!value) return 'Never';
-
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Never';
-
-  return date.toLocaleDateString();
+  return Number.isNaN(date.getTime()) ? 'Never' : date.toLocaleDateString();
 };
-
-const getNodeCount = (workflow) => {
-  if (Number.isFinite(workflow?.nodeCount)) {
-    return workflow.nodeCount;
-  }
-
-  return Array.isArray(workflow?.nodes) ? workflow.nodes.length : 0;
-};
-
-const isActiveWorkflow = (workflow) => workflow?.status === 'ACTIVE';
 
 const Workflows = () => {
   const navigate = useNavigate();
   const {
     workflows,
-    createWorkflow,
     deleteWorkflow,
     executeWorkflow,
     fetchWorkflows,
@@ -75,12 +53,6 @@ const Workflows = () => {
   const [statusFilter, setStatusFilter] = React.useState('ALL');
   const [actionWorkflowId, setActionWorkflowId] = React.useState(null);
   const [deleteModal, setDeleteModal] = React.useState({ open: false, workflow: null });
-  const [createModal, setCreateModal] = React.useState({
-    open: false,
-    name: '',
-    description: '',
-    status: 'ACTIVE',
-  });
   const [toast, setToast] = React.useState({ open: false, message: '', tone: 'info' });
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 250);
@@ -126,59 +98,17 @@ const Workflows = () => {
 
   const stats = React.useMemo(() => {
     const total = workflows.length;
-    const active = workflows.filter((workflow) => isActiveWorkflow(workflow)).length;
-    const executions = workflows.reduce((accumulator, workflow) => {
-      if (Number.isFinite(workflow.executionCount)) {
-        return accumulator + workflow.executionCount;
-      }
-
-      if (Array.isArray(workflow.executions)) {
-        return accumulator + workflow.executions.length;
-      }
-
-      return accumulator;
-    }, 0);
+    const active = workflows.filter((w) => w.status === 'ACTIVE').length;
+    const executions = workflows.reduce((acc, w) => acc + (w.executionCount || 0), 0);
 
     return { total, active, executions };
   }, [workflows]);
 
-  const handleCreateWorkflow = async () => {
-    const name = createModal.name.trim();
-    const description = createModal.description.trim();
-    const status = createModal.status.toUpperCase();
-
-    if (!name) {
-      showToast('Workflow name is required.', 'error');
-      return;
-    }
-
-    if (!ALLOWED_STATUSES.includes(status)) {
-      showToast('Status must be ACTIVE or INACTIVE.', 'error');
-      return;
-    }
-
-    setActionWorkflowId('create');
-
-    try {
-      await createWorkflow({ name, description, status });
-      setCreateModal({ open: false, name: '', description: '', status: 'ACTIVE' });
-      await refreshWorkflows();
-      showToast('Workflow created successfully.', 'success');
-    } catch (err) {
-      showToast(err.message || 'Failed to create workflow', 'error');
-    } finally {
-      setActionWorkflowId(null);
-    }
-  };
-
   const handleDeleteWorkflow = async () => {
     const workflowId = deleteModal.workflow?.id;
-    if (!workflowId) {
-      return;
-    }
+    if (!workflowId) return;
 
     setActionWorkflowId(workflowId);
-
     try {
       await deleteWorkflow(workflowId);
       setDeleteModal({ open: false, workflow: null });
@@ -192,7 +122,6 @@ const Workflows = () => {
 
   const handleToggleStatus = async (workflow) => {
     setActionWorkflowId(workflow.id);
-
     try {
       await toggleWorkflowStatus(workflow.id);
       showToast(
@@ -208,7 +137,6 @@ const Workflows = () => {
 
   const handleExecuteWorkflow = async (workflow) => {
     setActionWorkflowId(workflow.id);
-
     try {
       await executeWorkflow(workflow.id);
       showToast('Workflow execution started.', 'success');
@@ -230,10 +158,7 @@ const Workflows = () => {
         </div>
         <button
           type="button"
-          onClick={() => {
-            clearError?.();
-            setCreateModal((current) => ({ ...current, open: true }));
-          }}
+          onClick={() => navigate('/create-workflow')}
           className="inline-flex items-center gap-2 rounded-2xl bg-[#292D32] px-5 py-3 text-sm font-semibold text-white hover:bg-[#3C4249]"
         >
           <Plus size={16} />
@@ -262,7 +187,7 @@ const Workflows = () => {
           <input
             type="text"
             value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search workflows"
             className="w-full rounded-2xl border border-[#E2E8F0] bg-white py-3 pl-10 pr-4 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none"
           />
@@ -302,7 +227,7 @@ const Workflows = () => {
       ) : !hasLoadedOnce && isLoading ? (
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
-            <WorkflowCardSkeleton key={`workflow-skeleton-${index}`} />
+            <WorkflowCardSkeleton key={`skeleton-${index}`} />
           ))}
         </section>
       ) : filteredWorkflows.length === 0 ? (
@@ -318,7 +243,7 @@ const Workflows = () => {
           </p>
           <button
             type="button"
-            onClick={() => setCreateModal((current) => ({ ...current, open: true }))}
+            onClick={() => navigate('/create-workflow')}
             className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#292D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3C4249]"
           >
             <Plus size={16} />
@@ -337,102 +262,11 @@ const Workflows = () => {
               onExecute={() => handleExecuteWorkflow(workflow)}
               onToggle={() => handleToggleStatus(workflow)}
               onDelete={() => setDeleteModal({ open: true, workflow })}
-              formatDate={(item) =>
-                formatDate(item.createdAt || item.updatedAt || item.lastExecution || null)
-              }
+              formatDate={(w) => formatDate(w.createdAt || w.updatedAt || w.lastExecution || null)}
             />
           ))}
         </section>
       )}
-
-      <Modal
-        isOpen={createModal.open}
-        onClose={() =>
-          setCreateModal({
-            open: false,
-            name: '',
-            description: '',
-            status: 'ACTIVE',
-          })
-        }
-        title="Create Workflow"
-      >
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[#292D32]">Name</label>
-            <input
-              type="text"
-              value={createModal.name}
-              onChange={(event) =>
-                setCreateModal((current) => ({
-                  ...current,
-                  name: event.target.value,
-                }))
-              }
-              placeholder="Email Notification Workflow"
-              className="w-full rounded-xl border border-[#E2E8F0] px-3 py-2 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[#292D32]">Description</label>
-            <textarea
-              value={createModal.description}
-              onChange={(event) =>
-                setCreateModal((current) => ({
-                  ...current,
-                  description: event.target.value,
-                }))
-              }
-              placeholder="Describe the workflow objective..."
-              rows={3}
-              className="w-full rounded-xl border border-[#E2E8F0] px-3 py-2 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[#292D32]">Status</label>
-            <select
-              value={createModal.status}
-              onChange={(event) =>
-                setCreateModal((current) => ({
-                  ...current,
-                  status: event.target.value.toUpperCase(),
-                }))
-              }
-              className="w-full rounded-xl border border-[#E2E8F0] px-3 py-2 text-sm text-[#292D32] focus:border-[#D0FFA4] focus:outline-none"
-            >
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="INACTIVE">INACTIVE</option>
-            </select>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() =>
-                setCreateModal({
-                  open: false,
-                  name: '',
-                  description: '',
-                  status: 'ACTIVE',
-                })
-              }
-              className="rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm font-semibold text-[#5C5C5C] hover:border-[#D0FFA4]"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleCreateWorkflow}
-              disabled={actionWorkflowId === 'create'}
-              className="rounded-xl bg-[#292D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3C4249] disabled:opacity-70"
-            >
-              {actionWorkflowId === 'create' ? 'Creating...' : 'Create Workflow'}
-            </button>
-          </div>
-        </div>
-      </Modal>
 
       <Modal isOpen={deleteModal.open} onClose={() => setDeleteModal({ open: false, workflow: null })} title="Delete Workflow">
         <p className="mb-5 text-sm text-[#5C5C5C]">
@@ -466,162 +300,5 @@ const Workflows = () => {
     </div>
   );
 };
-
-const WorkflowCard = ({
-  workflow,
-  actionInProgress,
-  onView,
-  onEdit,
-  onExecute,
-  onToggle,
-  onDelete,
-  formatDate,
-}) => {
-  const [showMenu, setShowMenu] = React.useState(false);
-  const isActive = isActiveWorkflow(workflow);
-  const nodeCount = getNodeCount(workflow);
-
-  return (
-    <article className="enterprise-card overflow-hidden">
-      <div className="p-5">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E2E8F0] bg-[#D0FFA4]">
-              <GitBranch size={18} className="text-[#292D32]" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#292D32]">{workflow.name}</p>
-              <span
-                className={[
-                  'inline-flex rounded-full px-2 py-1 text-[11px] font-semibold',
-                  isActive
-                    ? 'bg-[#D0FFA4] text-[#292D32]'
-                    : 'border border-[#E2E8F0] bg-white text-[#5C5C5C]',
-                ].join(' ')}
-              >
-                {isActive ? 'Running' : 'Paused'}
-              </span>
-            </div>
-          </div>
-
-          <div className="relative">
-            <button
-              type="button"
-              disabled={actionInProgress}
-              onClick={() => setShowMenu((prev) => !prev)}
-              className="rounded-lg p-1.5 text-[#5C5C5C] hover:bg-white"
-            >
-              <MoreVertical size={16} />
-            </button>
-
-            {showMenu && (
-              <div className="absolute right-0 z-10 mt-1 w-44 rounded-xl border border-[#E2E8F0] bg-white p-1 shadow-lg">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onView();
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#292D32] hover:bg-[#F6F5FA]"
-                >
-                  <Eye size={14} />
-                  View
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onEdit();
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#292D32] hover:bg-[#F6F5FA]"
-                >
-                  <Edit size={14} />
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onExecute();
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#292D32] hover:bg-[#F6F5FA]"
-                >
-                  <Play size={14} />
-                  Execute
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onToggle();
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#292D32] hover:bg-[#F6F5FA]"
-                >
-                  {isActive ? <Pause size={14} /> : <Play size={14} />}
-                  {isActive ? 'Disable' : 'Enable'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onDelete();
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#EF4444] hover:bg-red-50"
-                >
-                  <Trash2 size={14} />
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <p className="mt-4 text-sm text-[#5C5C5C]">
-          {workflow.description || 'No description has been provided for this workflow.'}
-        </p>
-
-        <div className="mt-4 flex items-center justify-between text-xs text-[#5C5C5C]">
-          <span className="inline-flex items-center gap-1">
-            <GitBranch size={12} />
-            {nodeCount} nodes
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Clock size={12} />
-            {formatDate(workflow)}
-          </span>
-        </div>
-      </div>
-
-      <div className="border-t border-[#E2E8F0] px-5 py-3">
-        <button
-          type="button"
-          onClick={onView}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#292D32] hover:text-[#3C4249]"
-        >
-          Open Workflow
-          <ArrowRight size={14} />
-        </button>
-      </div>
-    </article>
-  );
-};
-
-const WorkflowCardSkeleton = () => (
-  <article className="enterprise-card overflow-hidden">
-    <div className="space-y-4 p-5">
-      <div className="h-4 w-2/3 rounded bg-[#E2E8F0]" />
-      <div className="h-7 w-20 rounded-full bg-[#E2E8F0]" />
-      <div className="h-4 w-full rounded bg-[#E2E8F0]" />
-      <div className="h-4 w-5/6 rounded bg-[#E2E8F0]" />
-      <div className="flex items-center justify-between">
-        <div className="h-4 w-20 rounded bg-[#E2E8F0]" />
-        <div className="h-4 w-24 rounded bg-[#E2E8F0]" />
-      </div>
-    </div>
-    <div className="border-t border-[#E2E8F0] px-5 py-3">
-      <div className="h-4 w-28 rounded bg-[#E2E8F0]" />
-    </div>
-  </article>
-);
 
 export default Workflows;

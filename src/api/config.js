@@ -13,4 +13,5 @@ export const API_BASE_URL = explicitBaseUrl
   : `${gatewayUrl}${prefix}`;
 
 export const WORKFLOWS_ENDPOINT = '/workflows';
+export const WORKFLOW_CONFIGURATION_ENDPOINT = '/workflows/configuration';
 export const EXECUTIONS_ENDPOINT = '/executions';

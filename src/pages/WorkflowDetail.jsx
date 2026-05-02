@@ -17,10 +17,14 @@ import {
 import Modal from '../components/ui/Modal';
 import Toast from '../components/ui/Toast';
 import CustomNode from '../components/workflow/nodes/CustomNode';
-import { nodeTypes } from '../mock/data';
+import StatCard from '../components/workflow/StatCard';
 import useWorkflowStore from '../stores/workflowStore';
 
-const nodeTypesMap = Object.fromEntries(nodeTypes.map((node) => [node.type, CustomNode]));
+const formatDate = (value) => {
+  if (!value) return 'Never';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 'Never' : date.toLocaleString();
+};
 
 const WorkflowDetail = () => {
   const { id } = useParams();
@@ -164,6 +168,13 @@ const WorkflowDetail = () => {
       label: node.data?.label || node.type,
     },
   }));
+  const nodeTypesMap = nodes.reduce(
+    (accumulator, node) => ({
+      ...accumulator,
+      [node.type]: CustomNode,
+    }),
+    { trigger: CustomNode }
+  );
 
   const edges = (workflow.edges || []).map((edge) => ({
     ...edge,
@@ -171,14 +182,6 @@ const WorkflowDetail = () => {
     style: { stroke: '#D0FFA4', strokeWidth: 2.2 },
   }));
 
-  const formatDate = (value) => {
-    if (!value) return 'Never';
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return 'Never';
-
-    return date.toLocaleString();
-  };
 
   return (
     <div className="space-y-5 font-urbanist">
@@ -381,11 +384,5 @@ const WorkflowDetail = () => {
   );
 };
 
-const StatCard = ({ label, value }) => (
-  <article className="enterprise-card p-4">
-    <p className="text-xs uppercase tracking-[0.06em] text-[#5C5C5C]">{label}</p>
-    <p className="mt-2 text-xl font-bold text-[#292D32]">{value}</p>
-  </article>
-);
 
 export default WorkflowDetail;

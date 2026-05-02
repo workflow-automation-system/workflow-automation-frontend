@@ -5,11 +5,11 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/Dashboard';
 import Organisation from './pages/Organisation';
-import WorkflowPage from './pages/WorkflowPage';
 import AppConnections from './pages/AppConnections';
 import Templates from './pages/Templates';
 import CreateWorkflow from './pages/CreateWorkflow';
 import WorkflowDetail from './pages/WorkflowDetail';
+import Workflows from './pages/Workflows';
 import Settings from './pages/Settings';
 import useAuthStore from './stores/authStore';
 import useThemeStore from './stores/themeStore';
@@ -75,7 +75,7 @@ function App() {
         >
           <Route path="/" element={<Dashboard />} />
           <Route path="/organisation" element={<Organisation />} />
-          <Route path="/workflows" element={<WorkflowPage />} />
+          <Route path="/workflows" element={<Workflows />} />
           <Route path="/app-connections" element={<AppConnections />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/create-workflow" element={<CreateWorkflow />} />
