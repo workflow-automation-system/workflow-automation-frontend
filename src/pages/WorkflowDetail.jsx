@@ -15,6 +15,7 @@ import {
   Workflow,
 } from 'lucide-react';
 import Modal from '../components/ui/Modal';
+import Toast from '../components/ui/Toast';
 import CustomNode from '../components/workflow/nodes/CustomNode';
 import { nodeTypes } from '../mock/data';
 import useWorkflowStore from '../stores/workflowStore';
@@ -24,10 +25,112 @@ const nodeTypesMap = Object.fromEntries(nodeTypes.map((node) => [node.type, Cust
 const WorkflowDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { deleteWorkflow, getWorkflowById, toggleWorkflowStatus } = useWorkflowStore();
-  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const {
+    workflows,
+    deleteWorkflow,
+    executeWorkflow,
+    fetchWorkflowById,
+    toggleWorkflowStatus,
+  } = useWorkflowStore();
 
-  const workflow = getWorkflowById(id);
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [loadingWorkflow, setLoadingWorkflow] = React.useState(false);
+  const [action, setAction] = React.useState('');
+  const [toast, setToast] = React.useState({ open: false, message: '', tone: 'info' });
+
+  const workflow = React.useMemo(
+    () => workflows.find((item) => String(item.id) === String(id)),
+    [id, workflows]
+  );
+
+  const showToast = React.useCallback((message, tone = 'info') => {
+    setToast({ open: true, message, tone });
+  }, []);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    const loadWorkflow = async () => {
+      if (!id || workflow) {
+        return;
+      }
+
+      setLoadingWorkflow(true);
+      try {
+        await fetchWorkflowById(id);
+      } catch (err) {
+        if (!cancelled) {
+          showToast(err.message || 'Failed to load workflow', 'error');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingWorkflow(false);
+        }
+      }
+    };
+
+    loadWorkflow();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchWorkflowById, id, showToast, workflow]);
+
+  const handleToggleStatus = async () => {
+    if (!workflow) return;
+
+    setAction('toggle');
+
+    try {
+      await toggleWorkflowStatus(workflow.id);
+      showToast(
+        workflow.status === 'ACTIVE' ? 'Workflow paused successfully.' : 'Workflow resumed successfully.',
+        'success'
+      );
+    } catch (err) {
+      showToast(err.message || 'Failed to update workflow status', 'error');
+    } finally {
+      setAction('');
+    }
+  };
+
+  const handleExecuteWorkflow = async () => {
+    if (!workflow) return;
+
+    setAction('execute');
+
+    try {
+      await executeWorkflow(workflow.id);
+      showToast('Workflow execution started.', 'success');
+    } catch (err) {
+      showToast(err.message || 'Failed to execute workflow', 'error');
+    } finally {
+      setAction('');
+    }
+  };
+
+  const handleDeleteWorkflow = async () => {
+    if (!workflow) return;
+
+    setAction('delete');
+
+    try {
+      await deleteWorkflow(workflow.id);
+      showToast('Workflow deleted successfully.', 'success');
+      navigate('/workflows');
+    } catch (err) {
+      showToast(err.message || 'Failed to delete workflow', 'error');
+      setAction('');
+    }
+  };
+
+  if (loadingWorkflow && !workflow) {
+    return (
+      <div className="enterprise-card flex h-72 flex-col items-center justify-center text-center font-urbanist">
+        <p className="text-sm text-[#5C5C5C]">Loading workflow...</p>
+      </div>
+    );
+  }
 
   if (!workflow) {
     return (
@@ -46,7 +149,11 @@ const WorkflowDetail = () => {
     );
   }
 
-  const executions = workflow.executions || [];
+  const isActive = workflow.status === 'ACTIVE';
+  const executions = Array.isArray(workflow.executions) ? workflow.executions : [];
+  const executionCount = Number.isFinite(workflow.executionCount)
+    ? workflow.executionCount
+    : executions.length;
   const successful = executions.filter((execution) => execution.status === 'success').length;
   const successRate = executions.length ? ((successful / executions.length) * 100).toFixed(0) : '0';
 
@@ -66,7 +173,11 @@ const WorkflowDetail = () => {
 
   const formatDate = (value) => {
     if (!value) return 'Never';
-    return new Date(value).toLocaleString();
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'Never';
+
+    return date.toLocaleString();
   };
 
   return (
@@ -87,12 +198,12 @@ const WorkflowDetail = () => {
                 <span
                   className={[
                     'rounded-full px-2 py-1 text-xs font-semibold',
-                    workflow.status === 'active'
+                    isActive
                       ? 'bg-[#D0FFA4] text-[#292D32]'
                       : 'border border-[#E2E8F0] bg-white text-[#5C5C5C]',
                   ].join(' ')}
                 >
-                  {workflow.status === 'active' ? 'Running' : 'Paused'}
+                  {isActive ? 'Running' : 'Paused'}
                 </span>
               </div>
               <p className="mt-1 text-sm text-[#5C5C5C]">
@@ -104,16 +215,26 @@ const WorkflowDetail = () => {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => toggleWorkflowStatus(id)}
+              onClick={handleExecuteWorkflow}
+              disabled={action !== ''}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#292D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3C4249] disabled:opacity-60"
+            >
+              <Play size={14} />
+              {action === 'execute' ? 'Executing...' : 'Execute'}
+            </button>
+            <button
+              type="button"
+              onClick={handleToggleStatus}
+              disabled={action !== ''}
               className={[
-                'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold',
-                workflow.status === 'active'
+                'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-60',
+                isActive
                   ? 'border border-[#E2E8F0] bg-white text-[#5C5C5C] hover:border-[#D0FFA4]'
                   : 'bg-[#D0FFA4] text-[#292D32] hover:bg-[#BDEB94]',
               ].join(' ')}
             >
-              {workflow.status === 'active' ? <Pause size={14} /> : <Play size={14} />}
-              {workflow.status === 'active' ? 'Disable' : 'Enable'}
+              {isActive ? <Pause size={14} /> : <Play size={14} />}
+              {isActive ? 'Disable' : 'Enable'}
             </button>
             <button
               type="button"
@@ -136,10 +257,13 @@ const WorkflowDetail = () => {
       </header>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <StatCard label="Nodes" value={String(workflow.nodes?.length || 0)} />
-        <StatCard label="Executions" value={String(executions.length)} />
+        <StatCard label="Nodes" value={String(workflow.nodeCount ?? workflow.nodes?.length ?? 0)} />
+        <StatCard label="Executions" value={String(executionCount)} />
         <StatCard label="Success Rate" value={`${successRate}%`} />
-        <StatCard label="Last Run" value={workflow.lastExecution ? new Date(workflow.lastExecution).toLocaleDateString() : 'Never'} />
+        <StatCard
+          label="Last Run"
+          value={workflow.lastExecution ? new Date(workflow.lastExecution).toLocaleDateString() : 'Never'}
+        />
       </section>
 
       <section className="enterprise-card overflow-hidden">
@@ -192,27 +316,32 @@ const WorkflowDetail = () => {
                   <th className="px-5 py-3">Trigger</th>
                 </tr>
               </thead>
-               <tbody className="divide-y divide-[#E2E8F0] bg-[#F6F5FA]">
-                {executions.map((execution) => (
-                  <tr key={execution.id}>
-                    <td className="px-5 py-3 text-sm text-[#292D32]">{formatDate(execution.timestamp)}</td>
-                    <td className="px-5 py-3">
-                      <span
-                        className={[
-                          'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',
-                          execution.status === 'success'
-                            ? 'bg-[#D0FFA4] text-[#292D32]'
-                            : 'bg-[#D0FFA4] text-[#292D32]',
-                        ].join(' ')}
-                      >
-                        {execution.status === 'success' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
-                        {execution.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3 text-sm text-[#5C5C5C]">{execution.duration}</td>
-                    <td className="px-5 py-3 text-sm text-[#5C5C5C]">{execution.trigger}</td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-[#E2E8F0] bg-[#F6F5FA]">
+                {executions.map((execution, index) => {
+                  const executionStatus = String(execution.status || '').toLowerCase();
+                  const isSuccess = executionStatus === 'success';
+
+                  return (
+                    <tr key={execution.id || `${workflow.id}-execution-${index}`}>
+                      <td className="px-5 py-3 text-sm text-[#292D32]">{formatDate(execution.timestamp)}</td>
+                      <td className="px-5 py-3">
+                        <span
+                          className={[
+                            'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',
+                            isSuccess
+                              ? 'bg-[#D0FFA4] text-[#292D32]'
+                              : 'border border-red-200 bg-red-50 text-[#EF4444]',
+                          ].join(' ')}
+                        >
+                          {isSuccess ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
+                          {execution.status || 'unknown'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-sm text-[#5C5C5C]">{execution.duration || '-'}</td>
+                      <td className="px-5 py-3 text-sm text-[#5C5C5C]">{execution.trigger || '-'}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -233,16 +362,21 @@ const WorkflowDetail = () => {
           </button>
           <button
             type="button"
-            onClick={() => {
-              deleteWorkflow(id);
-              navigate('/workflows');
-            }}
-            className="rounded-xl bg-[#EF4444] px-4 py-2 text-sm font-semibold text-white hover:bg-[#DC2626]"
+            onClick={handleDeleteWorkflow}
+            disabled={action === 'delete'}
+            className="rounded-xl bg-[#EF4444] px-4 py-2 text-sm font-semibold text-white hover:bg-[#DC2626] disabled:opacity-60"
           >
-            Delete
+            {action === 'delete' ? 'Deleting...' : 'Delete'}
           </button>
         </div>
       </Modal>
+
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        tone={toast.tone}
+        onClose={() => setToast((current) => ({ ...current, open: false }))}
+      />
     </div>
   );
 };
@@ -255,5 +389,3 @@ const StatCard = ({ label, value }) => (
 );
 
 export default WorkflowDetail;
-
-

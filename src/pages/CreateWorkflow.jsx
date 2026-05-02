@@ -15,36 +15,73 @@ import { ArrowLeft, FileText, Play, Save, ShieldCheck, SplitSquareVertical } fro
 import ConfigPanel from '../components/workflow/ConfigPanel';
 import NodeSidebar from '../components/workflow/NodeSidebar';
 import CustomNode from '../components/workflow/nodes/CustomNode';
+import Toast from '../components/ui/Toast';
 import { generateId, nodeTypes } from '../mock/data';
 import useWorkflowStore from '../stores/workflowStore';
 
 const nodeTypesMap = Object.fromEntries(nodeTypes.map((node) => [node.type, CustomNode]));
+const ALLOWED_STATUSES = ['ACTIVE', 'INACTIVE'];
 
 const CreateWorkflow = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const workflowId = searchParams.get('id');
-  const { createWorkflow, getWorkflowById, updateWorkflow } = useWorkflowStore();
+  const { createWorkflow, fetchWorkflowById, getWorkflowById, updateWorkflow } = useWorkflowStore();
 
   const [name, setName] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [status, setStatus] = React.useState('ACTIVE');
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = React.useState(null);
   const [saving, setSaving] = React.useState(false);
+  const [loadingWorkflow, setLoadingWorkflow] = React.useState(false);
   const [reactFlowInstance, setReactFlowInstance] = React.useState(null);
+  const [toast, setToast] = React.useState({ open: false, message: '', tone: 'info' });
+
+  const showToast = React.useCallback((message, tone = 'info') => {
+    setToast({ open: true, message, tone });
+  }, []);
 
   React.useEffect(() => {
-    if (!workflowId) return;
+    let cancelled = false;
 
-    const existingWorkflow = getWorkflowById(workflowId);
-    if (!existingWorkflow) return;
+    const loadWorkflow = async () => {
+      if (!workflowId) return;
 
-    setName(existingWorkflow.name || '');
-    setDescription(existingWorkflow.description || '');
-    setNodes(existingWorkflow.nodes || []);
-    setEdges(existingWorkflow.edges || []);
-  }, [workflowId, getWorkflowById, setEdges, setNodes]);
+      setLoadingWorkflow(true);
+
+      try {
+        let existingWorkflow = getWorkflowById(workflowId);
+
+        if (!existingWorkflow) {
+          existingWorkflow = await fetchWorkflowById(workflowId);
+        }
+
+        if (!cancelled && existingWorkflow) {
+          setName(existingWorkflow.name || '');
+          setDescription(existingWorkflow.description || '');
+          setStatus((existingWorkflow.status || 'ACTIVE').toUpperCase());
+          setNodes(Array.isArray(existingWorkflow.nodes) ? existingWorkflow.nodes : []);
+          setEdges(Array.isArray(existingWorkflow.edges) ? existingWorkflow.edges : []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          showToast(err.message || 'Failed to load workflow', 'error');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingWorkflow(false);
+        }
+      }
+    };
+
+    loadWorkflow();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchWorkflowById, getWorkflowById, workflowId, setEdges, setNodes, showToast]);
 
   const onConnect = React.useCallback(
     (connection) => {
@@ -91,33 +128,43 @@ const CreateWorkflow = () => {
   );
 
   const handleSave = async () => {
-    if (!name.trim()) {
-      window.alert('Please enter a workflow name before saving.');
+    const trimmedName = name.trim();
+    const normalizedStatus = String(status || '').toUpperCase();
+
+    if (!trimmedName) {
+      showToast('Workflow name is required before saving.', 'error');
+      return;
+    }
+
+    if (!ALLOWED_STATUSES.includes(normalizedStatus)) {
+      showToast('Status must be ACTIVE or INACTIVE.', 'error');
       return;
     }
 
     setSaving(true);
+
     const payload = {
-      id: workflowId || generateId('wf'),
-      name: name.trim(),
+      name: trimmedName,
       description: description.trim(),
-      status: workflowId ? getWorkflowById(workflowId)?.status || 'inactive' : 'inactive',
+      status: normalizedStatus,
       nodes,
       edges,
-      lastExecution: workflowId ? getWorkflowById(workflowId)?.lastExecution || null : null,
-      executions: workflowId ? getWorkflowById(workflowId)?.executions || [] : [],
     };
 
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    try {
+      if (workflowId) {
+        await updateWorkflow(workflowId, payload);
+      } else {
+        await createWorkflow(payload);
+      }
 
-    if (workflowId) {
-      updateWorkflow(workflowId, payload);
-    } else {
-      createWorkflow(payload);
+      showToast('Workflow saved successfully.', 'success');
+      navigate('/workflows');
+    } catch (err) {
+      showToast(err.message || 'Failed to save workflow', 'error');
+    } finally {
+      setSaving(false);
     }
-
-    setSaving(false);
-    navigate('/workflows');
   };
 
   const handleDeleteNode = () => {
@@ -171,6 +218,14 @@ const CreateWorkflow = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={status}
+              onChange={(event) => setStatus(event.target.value.toUpperCase())}
+              className="rounded-xl border border-[#E2E8F0] bg-white px-3 py-2 text-sm font-semibold text-[#292D32]"
+            >
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="INACTIVE">INACTIVE</option>
+            </select>
             <button
               type="button"
               onClick={() => navigate('/workflows')}
@@ -181,7 +236,7 @@ const CreateWorkflow = () => {
             <button
               type="button"
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || loadingWorkflow}
               className="inline-flex items-center gap-2 rounded-xl bg-[#292D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3C4249] disabled:opacity-60"
             >
               <Save size={14} />
@@ -229,7 +284,7 @@ const CreateWorkflow = () => {
             >
               <Background gap={24} color="#E2E8F0" />
               <Controls />
-                <MiniMap nodeColor="#D0FFA4" maskColor="rgba(246, 245, 250, 0.7)" />
+              <MiniMap nodeColor="#D0FFA4" maskColor="rgba(246, 245, 250, 0.7)" />
             </ReactFlow>
 
             <button
@@ -285,12 +340,21 @@ const CreateWorkflow = () => {
           Enterprise-ready
         </div>
       </footer>
+
+      {loadingWorkflow && workflowId ? (
+        <div className="fixed bottom-5 left-1/2 z-[60] -translate-x-1/2 rounded-xl border border-[#E2E8F0] bg-white px-4 py-2 text-sm text-[#292D32] shadow-lg">
+          Loading workflow...
+        </div>
+      ) : null}
+
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        tone={toast.tone}
+        onClose={() => setToast((current) => ({ ...current, open: false }))}
+      />
     </div>
   );
 };
 
 export default CreateWorkflow;
-
-
-
-

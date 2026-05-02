@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
   ArrowRight,
-  Bot,
   ChartSpline,
   CheckCircle2,
   Mail,

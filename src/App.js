@@ -80,6 +80,7 @@ function App() {
           <Route path="/templates" element={<Templates />} />
           <Route path="/create-workflow" element={<CreateWorkflow />} />
           <Route path="/workflow/:id" element={<WorkflowDetail />} />
+          <Route path="/workflows/:id" element={<WorkflowDetail />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
 

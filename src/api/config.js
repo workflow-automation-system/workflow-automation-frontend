@@ -1,5 +1,16 @@
-const rawBaseUrl = process.env.REACT_APP_API_BASE_URL || '';
+const trimTrailingSlash = (value = '') => value.replace(/\/+$/, '');
+const ensureLeadingSlash = (value = '') => (value.startsWith('/') ? value : `/${value}`);
 
-export const API_BASE_URL = rawBaseUrl.replace(/\/+$/, '');
+const explicitBaseUrl = process.env.REACT_APP_API_BASE_URL;
+const rawGatewayUrl = process.env.REACT_APP_API_GATEWAY_URL || 'http://localhost:8085';
+const rawPrefix = process.env.REACT_APP_API_PREFIX || '/api';
 
-export const WORKFLOW_ENDPOINT = '/workflow';
+const gatewayUrl = trimTrailingSlash(rawGatewayUrl);
+const prefix = trimTrailingSlash(ensureLeadingSlash(rawPrefix));
+
+export const API_BASE_URL = explicitBaseUrl
+  ? trimTrailingSlash(explicitBaseUrl)
+  : `${gatewayUrl}${prefix}`;
+
+export const WORKFLOWS_ENDPOINT = '/workflows';
+export const EXECUTIONS_ENDPOINT = '/executions';
